@@ -44,6 +44,13 @@ uninsur=uninsur%>%select(GEO_ID,S2701_C05_001E)
 uninsur=uninsur[-c(1),]
 uninsur=uninsur%>%mutate(TractID=substr(GEO_ID,10,20))
 uninsur=rename(uninsur,uninsurRate=S2701_C05_001E)
+
+## import race data
+mino=read.csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/Race_18_19.csv")
+mino=rename(mino,TractID=FIPS)
+mino=rename(mino,minority=X2019)
+
+merged=read_csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
 ```
 
 ## extract variables
@@ -62,6 +69,9 @@ xs=xs[-c(2),]
 ## merge datasets
 ```{r}
 data2019=merge(xs,y2019,by.x = "TractID",by.y = "TractID")
+
+data2019=merge(merged,mino,by.x = "TractID",by.y = "TractID")
+
 ```
 
 ## export datasets
