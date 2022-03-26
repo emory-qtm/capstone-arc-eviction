@@ -1,0 +1,254 @@
+---
+title: "new eviction"
+author: "Fenton Sun"
+date: "3/14/2022"
+output: 
+  html_document: 
+    toc: yes
+    theme: flatly
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+eviction_new <- read.csv("median_and_average_evictions.csv")
+eviction_2019 <-  read.csv("median_and_average_evictions_2019.csv")
+SVI2 <- read.csv("cleaned_SVI_(2_27).csv")
+rent_burden <- read.csv("Cleaned_gross rent 30% of income or greater.csv")
+evic_rate <- read.csv("AverageMonthlyEvictionRate.csv")
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(GGally)
+library(knitr)
+library(stargazer)
+library(data.table)
+library(ggpubr)
+library(zoo)
+library(glmnet)
+library(plyr)
+library(corrplot)
+library(PerformanceAnalytics)
+library(glmnet)
+library(Rcpp)
+library(car)
+library(MASS)
+library(moments)
+library(nnet)
+library(pdp)
+library(Matrix)
+library(stargazer)
+library(rpart)
+library(gbm)
+```
+
+## 1. Merging data
+
+```{r merge}
+names(eviction_2019)[2] <- "GEOID"
+names(eviction_new)[2] <- "GEOID"
+names(SVI2)[5] <- "GEOID"
+names(rent_burden)[7] <- "RB"
+mer1 = merge(eviction_2019, SVI2, by = "GEOID")
+mer2 = merge(eviction_new, SVI2, by = "GEOID")
+mer3 = merge(mer1, rent_burden, by = "GEOID")
+mer4 = merge(mer2, rent_burden, by = "GEOID")
+mer4_final <- mer4 %>%
+  dplyr::select(GEOID, Year,AvgFilings, EP_POV, EP_NOHSDP, EP_MINRTY, EP_CROWD, EP_UNEMP, RB)
+evic_rate$Evic_rate = evic_rate$AvgMonthlyEvictionRate * 1200
+names(evic_rate)[3] <- "GEOID"
+evic_final <- evic_rate %>%
+  dplyr::select(GEOID, Year, Evic_rate)
+evic_2019 <- evic_final %>%
+  dplyr::filter(Year == "2019")
+mer7 = merge(evic_2019, SVI2, by = "GEOID")
+mer8 = merge(mer7, rent_burden, by = "GEOID")
+mer2019_final <- mer8 %>%
+  dplyr::select(GEOID, Year, Evic_rate, EP_POV, EP_NOHSDP, EP_MINRTY, EP_CROWD, EP_UNEMP, RB) %>%
+  drop_na()
+```
+
+## 2. Looking at data (Linear model)
+
+### 1. Multiple linear regression
+
+```{r model1}
+Fit = lm(log(Evic_rate) ~ EP_POV + EP_NOHSDP + EP_MINRTY + EP_CROWD + EP_UNEMP + RB, mer2019_final)
+summary(Fit)
+plot(Fit, which = c(2,4,6))
+mer2019_final_2 <- mer2019_final[-c(45,179,364),]
+Fit2 = lm(log(Evic_rate) ~ EP_POV + EP_NOHSDP + EP_MINRTY + EP_CROWD + EP_UNEMP + RB, mer2019_final_2)
+summary(Fit2)
+vif(Fit2)
+evic_number <- evic_final %>%
+  group_by(Year)
+
+
+```
+
+The R^2 of linear model is 0.5764, after deleting the outlier, the R^2 increased to 0.579, since the vif is smaller than 10, lasso regression doesn't fit, we try to use ridge and stepwise regression to analyze our model 
+
+### 2.  Ridge regression
+
+```{r model2}
+set.seed(12345)
+x_var <- data.matrix(mer2019_final_2[,c("EP_POV", "EP_NOHSDP","EP_MINRTY", "EP_CROWD", "EP_UNEMP", "RB")])
+y_var <- mer2019_final_2[,"Evic_rate"]
+Fit3 = glmnet(x_var, y_var, alpha = 0)
+summary(Fit3)
+ridge_cv <- cv.glmnet(x_var, y_var, alpha = 0)
+best_lambda <- ridge_cv$lambda.min
+best_lambda
+best_ridge <- glmnet(x_var, y_var, alpha = 0, lambda = best_lambda)
+coef(best_ridge)
+plot(Fit3, xvar = "lambda")
+y_predicted <- predict(Fit3, s = best_lambda, newx = x_var)
+sst <- sum((y_var - mean(y_var))^2)
+sse <- sum((y_predicted - y_var)^2)
+rsq <- 1 - sse/sst
+rsq
+
+```
+
+We use ridge to analyze the complexity of the model, since our lambda is small, the model is complex. Moreover, since the best lambda is extremely small, the shrinkage of the model is small, the model could not explain our problems well. 
+
+### 3. Stepwise
+
+```{r stepwise}
+#1. Forward stepwise selection
+set.seed(12345)
+intercept_only <- lm(Evic_rate ~ 1, data = mer2019_final_2)
+all <- lm(Evic_rate ~ EP_POV + EP_NOHSDP + EP_MINRTY + EP_CROWD + EP_UNEMP + RB, data = mer2019_final_2)
+forward <- step(intercept_only, direction='forward', scope=formula(all), trace=0)
+forward$anova
+forward$coefficients
+#2. Backward stepwise selection
+backward <- step(all, direction='backward', scope=formula(all), trace=0)
+backward$anova
+backward$coefficients
+#3. Both Direction 
+both <- step(all, direction='both', scope=formula(all), trace=0)
+both$anova
+both$coefficients
+```
+
+For the forward, first, we fit the intercept-only model. This model had an AIC of 3034. Next, we fit every possible one-predictor model. The model that produced the lowest AIC and also had a statistically significant reduction in AIC compared to the intercept-only model used the predictor minority. This model had an AIC of 2801. Next, we fit every possible two-predictor model. The model that produced the lowest AIC and also had a statistically significant reduction in AIC compared to the single-predictor model added the predictor poverty. This model had an AIC of 2751....
+The final models turn out to be evic = -3.2 + 0.198 * Minority + 0.41 * Poverty -0.381 * Nohsdp + 0.790 * crowded - 0.284 * unemployment (same logic in explaination for backward and both direction model)
+However, the r-sqr is lower than the mlr. 
+
+## 3. Nonlinear ML
+
+### 1. tree
+
+```{r tree1}
+set.seed(1234)
+control <- rpart.control(minbucket = 5, cp = 0.0001, maxsurrogate = 0, usesurrogate = 0, xval = 10)
+fit4 <- rpart(log(Evic_rate) ~ EP_POV + EP_NOHSDP + EP_MINRTY + EP_CROWD + EP_UNEMP + RB, mer2019_final_2, method = 'anova', control = control)
+plotcp(fit4)
+printcp(fit4)
+bestcp <- fit4$cptable[which.min(fit4$cptable[,"xerror"]),"CP"]
+bestcp
+fit5 <- prune(fit4, cp =  0.005422154)
+fit5$variable.importance
+fit5$cptable[nrow(fit5$cptable),]
+par(cex=0.9)
+plot(fit5, uniform = FALSE)
+text(fit5, use.n = TRUE)
+par(cex = 1)
+printcp(fit5)
+yhattree <- predict(fit5)
+y2 = log(mer2019_final_2$Evic_rate)
+etree <- y2 - yhattree
+c(sd(y2),sd(etree))
+r2tree <- 1-var(etree)/var(y2)
+r2tree
+fit5$variable.importance
+```
+
+I found the best CP 0.005422154, with the smallest training error 0.46161. The tree models gives me the training Rˆ2 = 0.6681999, and from the cptable, we found the corresponding xerror for cp = 0.005422154 is 0.46161, so the Rˆ2 is 1−0.46161 = 0.53839, so there is not an obvious overfitting here, so the model explained about 53.84% variability.
+
+### 2. nnet
+
+```{r nnet}
+CVInd <- function(n,K) {
+m<-floor(n/K)
+r<-n-m*K
+I<-sample(n,n)
+Ind<-list()
+for (k in 1:K) {
+  if (k <= r) 
+  kpart <- ((m+1)*(k-1)+1):((m+1)*k)
+  else 
+  kpart<-((m+1)*r+m*(k-r-1)+1):((m+1)*r+m*(k-r))
+Ind[[k]] <- I[kpart] 
+}
+Ind 
+}
+set.seed(12345)
+Nrep <- 3
+K <- 10
+n.models <- 3
+n = nrow(mer2019_final_2)
+y <- log(mer2019_final_2$Evic_rate)
+yhat <- matrix(0,n,n.models) 
+MSE <- matrix(0,Nrep,n.models) 
+for (j in 1:Nrep){
+  Ind<-CVInd(n,K)
+  for (k in 1:K){
+    out<-nnet(log(Evic_rate) ~ EP_POV + EP_NOHSDP + EP_MINRTY + EP_CROWD + EP_UNEMP + RB, mer2019_final_2[-Ind[[k]],], linout = TRUE, skip = FALSE, size = 5,decay = 0.1, maxit = 1000, trace = FALSE)
+    yhat[Ind[[k]],1]<-as.numeric(predict(out,mer2019_final_2[Ind[[k]],])) 
+    out<-nnet(log(Evic_rate) ~ EP_POV + EP_NOHSDP + EP_MINRTY + EP_CROWD + EP_UNEMP + RB, mer2019_final_2[-Ind[[k]],], linout = TRUE, skip = FALSE, size = 10,decay = 1, maxit = 1000, trace = FALSE)
+    yhat[Ind[[k]],2]<-as.numeric(predict(out,mer2019_final_2[Ind[[k]],])) 
+    out<-nnet(log(Evic_rate) ~ EP_POV + EP_NOHSDP + EP_MINRTY + EP_CROWD + EP_UNEMP + RB, mer2019_final_2[-Ind[[k]],], linout = TRUE, skip = FALSE, size = 15,decay = 5, maxit = 1000, trace = FALSE)
+    yhat[Ind[[k]],3]<-as.numeric(predict(out,mer2019_final_2[Ind[[k]],]))
+  }
+  MSE[j,]=apply(yhat,2,function(x) sum((y-x)^2))/n 
+}
+MSEAve<- apply(MSE,2,mean);
+MSEAve
+r2<-1-MSEAve/var(y);
+r2
+fit3 <- nnet(log(Evic_rate) ~ EP_POV + EP_NOHSDP + EP_MINRTY + EP_CROWD + EP_UNEMP + RB, mer2019_final_2, linout = TRUE, skip = FALSE, size = 15, decay = 5, maxit = 1000, trace = FALSE)
+summary(fit3)
+yhat<- as.numeric(predict(fit3))
+y = log(mer2019_final_2$Evic_rate)
+e <- y - yhat
+1-var(e)/var(y)
+p1 <- partial(fit3, pred.var = "EP_POV", plot = TRUE, plot.engine = "ggplot2")
+p2 <- partial(fit3, pred.var = "EP_NOHSDP", plot = TRUE, plot.engine = "ggplot2")
+p3 <- partial(fit3, pred.var = "EP_MINRTY", plot = TRUE, plot.engine = "ggplot2")
+p4 <- partial(fit3, pred.var = "EP_CROWD", plot = TRUE, plot.engine = "ggplot2")
+p5 <- partial(fit3, pred.var = "EP_UNEMP", plot = TRUE, plot.engine = "ggplot2")
+p6 <- partial(fit3, pred.var = "RB", plot = TRUE, plot.engine = "ggplot2")
+grid.arrange(p1, p2, p3, p4, p5, p6, ncol = 3)  
+# Check overfitting 
+SSEnn = nrow(mer2019_final_2) * 0.4989225
+SSEnn 
+SST=sum((y-mean(y))^2)
+SST
+r2nn <- 1-SSEnn/SST
+r2nn
+
+```
+
+I tried three different models with different size and decay using the Cross Validation, from the Mean Squared CV Error and CV Rˆ2, I found the second model I choose have the lowest MSEcv (0.4989225) and highest CV Rˆ2 (0.6118496), with size = 15 and decay = 5.
+From the above neural network model, I found the R2 is 0.6530495, which is higher than the linear model above.
+In order to check the problem of overfitting, I recalculate the Rˆ2 CV for both model, from the neural network model, the CV Rˆ2 is  0.6112164, which is also larger than the CV Rˆ2 for linear model (0.579), and don’t have too much difference with the Rˆ2 - 0.6530495 - I calculated above, so overfitting is not a big problem here.
+
+### 3. GBM
+
+```{r gbm}
+
+
+```
+
+### 4. Random Forest
+
+```{r random}
+
+
+
+```
+
+
