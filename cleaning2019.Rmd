@@ -1,0 +1,72 @@
+---
+title: "cleaning2019"
+author: "Kevin Ding"
+date: "3/24/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = setdiff(ls(), lsf.str()))
+install.packages("tidyverse")
+library(tidyverse)
+```
+
+
+## import Y datasets
+```{r}
+ys=read.csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/newdata/y variable/ymix.csv")
+y2019=ys%>%filter(Year==2019)
+y2019=y2019%>%mutate(avgYearlyEvictionRate=AvgMonthlyEvictionRate*12)
+```
+
+## import X datasets
+```{r}
+xinit=read_csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/productDownload_2022-03-22T163533/2019 data.csv")
+xinit=xinit[-c(1),]
+
+## import poverty rate data from Matt
+pov=read.csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/Cleaned_Pov_19.csv")
+pov=rename(pov,TractID=GEOID,povertyRate="X..Population.below.poverty.2019")
+pov=pov%>%select(TractID,povertyRate)
+
+## import educ data from hyesun
+educ=read.csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/2019_Education rate_Cleaned.csv")
+educ=educ%>%mutate(TractID=substr(GEO_ID,10,20))
+
+## import rent burden
+rent=read_csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/2019_Rent burden_Cleaned.csv")
+rent=rename(rent,TractID=GEOID)
+
+## import insurance data
+uninsur=read_csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/Uninsurance_19_20_UNcleaned/ACSST5Y2019.S2701_data_with_overlays_2022-03-25T132633.csv")
+uninsur=uninsur%>%select(GEO_ID,S2701_C05_001E)
+uninsur=uninsur[-c(1),]
+uninsur=uninsur%>%mutate(TractID=substr(GEO_ID,10,20))
+uninsur=rename(uninsur,uninsurRate=S2701_C05_001E)
+```
+
+## extract variables
+```{r}
+xs=xinit%>%select(GEO_ID,unemp=S2301_C04_001E)
+xs=xs%>%mutate(TractID=substr(GEO_ID,10,20))
+xs=merge(xs,pov,by.x = "TractID",by.y = "TractID")
+xs=merge(xs,educ,by.x = "TractID",by.y = "TractID")
+xs=merge(xs,rent,by.x = "TractID",by.y = "TractID")
+xs=merge(xs,uninsur,by.x = "TractID",by.y="TractID")
+xs=xs[-c(2),]
+
+```
+
+
+## merge datasets
+```{r}
+data2019=merge(xs,y2019,by.x = "TractID",by.y = "TractID")
+```
+
+## export datasets
+```{r}
+write_csv(data2019,"/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
+```
+
+
