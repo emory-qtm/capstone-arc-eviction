@@ -94,12 +94,18 @@ data=data[,-c(4,5,10,11,13,14,16,18,19,22,23,27,28,30)]
 data=rename(data,unemp_rate=unemp,poverty_rate=povertyRate,education_rate="Education.rate",uninsur_rate=uninsurRate,minority_rate=minority,avg_yearly_evic_rate=avgYearlyEvictionRate)
 data=rename(data,rent_burden="X..Gross.rent.30.0.percent.of.income.or.greater.2019")
 
+comp=read.csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019_complete.csv")
+needed=comp%>%select(TractID,renterRate)
+
+data19=merge(data,needed,by.x = "TractID",by.y = "TractID")
+data19=rename(data19,renter_rate=renterRate)
 ```
+
 
 
 ## export datasets
 ```{r}
-write_csv(data,"/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
+write_csv(data19,"/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
 
 ```
 
