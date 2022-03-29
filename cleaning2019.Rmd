@@ -74,6 +74,19 @@ data2019=merge(merged,mino,by.x = "TractID",by.y = "TractID")
 
 ```
 
+
+## adding 
+```{r}
+rent=read_csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/renter-occupied/Renter-occupied housing units_2019,2020/ACSDT5Y2019.B25003_data_with_overlays_2022-03-28T213336.csv")
+rent=rent%>%mutate(TractID=substr(GEO_ID,10,20))
+rent=rent[-c(1),]
+rent=rent%>%mutate(renterRate=as.numeric(B25003_003E)/as.numeric(B25003_001E))
+
+data=read_csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
+data2019=merge(data,rent,by.x = "TractID",by.y = "TractID")
+```
+
+
 ## export datasets
 ```{r}
 write_csv(data2019,"/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
