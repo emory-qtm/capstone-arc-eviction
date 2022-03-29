@@ -75,21 +75,32 @@ data2019=merge(merged,mino,by.x = "TractID",by.y = "TractID")
 ```
 
 
-## adding 
+## adding renter unit percentage variable 
 ```{r}
 rent=read_csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/renter-occupied/Renter-occupied housing units_2019,2020/ACSDT5Y2019.B25003_data_with_overlays_2022-03-28T213336.csv")
 rent=rent%>%mutate(TractID=substr(GEO_ID,10,20))
 rent=rent[-c(1),]
 rent=rent%>%mutate(renterRate=as.numeric(B25003_003E)/as.numeric(B25003_001E))
 
+
 data=read_csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
 data2019=merge(data,rent,by.x = "TractID",by.y = "TractID")
+```
+
+## rename and dropping unnecessary columns
+```{r}
+data=read_csv("/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
+data=data[,-c(4,5,10,11,13,14,16,18,19,22,23,27,28,30)]
+data=rename(data,unemp_rate=unemp,poverty_rate=povertyRate,education_rate="Education.rate",uninsur_rate=uninsurRate,minority_rate=minority,avg_yearly_evic_rate=avgYearlyEvictionRate)
+data=rename(data,rent_burden="X..Gross.rent.30.0.percent.of.income.or.greater.2019")
+
 ```
 
 
 ## export datasets
 ```{r}
-write_csv(data2019,"/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
+write_csv(data,"/Users/KevinDing/Desktop/spring-2022/qtm-capstone/latest data/data2019.csv")
+
 ```
 
 
