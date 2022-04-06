@@ -5,10 +5,36 @@ date: "4/5/2022"
 output: html_document
 ---
 
+## Import and Load Package
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 rm(list = setdiff(ls(), lsf.str()))
 install.packages("tidyverse")
 library(tidyverse)
 ```
+
+
+## Import Raw Datasets
+```{r}
+
+```
+
+
+
+## Extract and Clean X Variables
+```{r}
+
+```
+
+
+## Extract and Clean Y Variables 
+```{r}
+
+```
+
+## Merge Datasets
+```{r}
+
+```
+
 
