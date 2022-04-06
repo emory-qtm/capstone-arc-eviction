@@ -1,0 +1,14 @@
+---
+title: "Data Cleaning"
+author: "ARC Capstone Team"
+date: "4/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = setdiff(ls(), lsf.str()))
+install.packages("tidyverse")
+library(tidyverse)
+```
+
