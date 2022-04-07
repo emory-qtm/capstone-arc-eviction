@@ -67,8 +67,6 @@ dir.create(final_csv_folder, showWarnings = FALSE)
 
 ```
 
-```
-
 ## Import Raw Datasets
 ```{r}
 # Import poverty dataset of year 2020 from the U.S. Census Bureau website
@@ -100,8 +98,6 @@ rent19=read.csv(renter_occupied_19_dir)
 unemp19<-read.csv(unemployment_19_dir)
 unemp20<-read.csv(unemployment_20_dir)
 ```
-
-
 
 ## Extract and Clean X Variables
 ```{r}
@@ -289,7 +285,6 @@ write.csv(unemp_cleaning(unemp19), file.path(cleaned_csv_folder, "unemployment_r
 write.csv(unemp_cleaning(unemp20), file.path(cleaned_csv_folder, "unemployment_rate_cleaned_2020.csv"), row.names=FALSE)
 ```
 
-
 ## Extract and Clean Y Variables 
 # Compute annual/monthly eviction rate
 ```{r}
@@ -435,7 +430,3 @@ df_2020 <- merge(df_2020, renter)
 df_2020 <- merge(df_2020, unemp)
 write.csv(df_2020, file.path(final_csv_folder, "final_data_2020.csv"))
 ```
-
-
-
-
