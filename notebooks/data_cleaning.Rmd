@@ -11,30 +11,431 @@ knitr::opts_chunk$set(echo = TRUE)
 rm(list = setdiff(ls(), lsf.str()))
 install.packages("tidyverse")
 library(tidyverse)
+library(dplyr)
+library(tidyverse)
 ```
 
+# Setting up directory
+```{r}
+
+# Name of the folder where csv files are located
+csv_dir <- "rawdata"
+
+# Location and file name of the csv file 
+eviction_filing_csv <- "evictions.csv"
+household_count_csv <- "household_count.csv"
+education_19_csv <- "education_2019.csv"
+education_20_csv <- "education_2020.csv"
+rent_burden_19_csv <- "rent_burden_2019.csv"
+rent_burden_20_csv <- "rent_burden_2020.csv"
+unemployment_19_csv <- "unemp_2019.csv"
+unemployment_20_csv <- "unemp_2020.csv"
+uninsured_19_csv <- "uninsured_2019.csv"
+uninsured_20_csv <- "uninsured_2020.csv"
+race_18_19_csv <- "race_18_19.csv"
+race_20_csv <- "race_2020.csv"
+poverty_18_19_csv <- "poverty_18_19.csv"
+poverty_20_csv <- "poverty_2020.csv"
+renter_occupied_19_csv <- "renter_occupied_2019.csv"
+renter_occupied_20_csv <- "renter_occupied_2020.csv"
+
+# Location and file name of the csv file 
+eviction_filing_dir <- file.path(csv_dir, eviction_filing_csv)
+household_count_dir <- file.path(csv_dir, household_count_csv)
+education_19_dir <- file.path(csv_dir, education_19_csv)
+education_20_dir <- file.path(csv_dir, education_20_csv)
+rent_burden_19_dir <- file.path(csv_dir, rent_burden_19_csv)
+rent_burden_20_dir <- file.path(csv_dir, rent_burden_20_csv)
+unemployment_19_dir <- file.path(csv_dir, unemployment_19_csv)
+unemployment_20_dir <- file.path(csv_dir, unemployment_20_csv)
+uninsured_19_dir <- file.path(csv_dir, uninsured_19_csv)
+uninsured_20_dir <- file.path(csv_dir, uninsured_20_csv)
+race_18_19_dir <- file.path(csv_dir, race_18_19_csv)
+race_20_dir <- file.path(csv_dir, race_20_csv)
+poverty_18_19_dir <- file.path(csv_dir, poverty_18_19_csv)
+poverty_20_dir <-  file.path(csv_dir, poverty_20_csv)
+renter_occupied_19_dir <- file.path(csv_dir, renter_occupied_19_csv)
+renter_occupied_20_dir <- file.path(csv_dir, renter_occupied_20_csv)
+
+# A folder where cleaned dataset will be saved
+cleaned_csv_folder <- "cleaned_data"
+dir.create(cleaned_csv_folder, showWarnings = FALSE)
+
+# A folder where cleaned dataset will be saved
+final_csv_folder <- "final_csv"
+dir.create(final_csv_folder, showWarnings = FALSE)
+
+```
+
+```
 
 ## Import Raw Datasets
 ```{r}
+# Import poverty dataset of year 2020 from the U.S. Census Bureau website
+pov2020 <- read.csv(poverty_20_dir)
+# Import poverty dataset of year 2018 and 2019 from the Neighborhood Nexus website
+pov1819 <- read.csv(poverty_18_19_dir)
 
+# Import education data  that estimates education attainment
+edu_20 <-read.csv(education_19_dir)
+edu_19 <- read.csv(education_20_dir)
+
+# Import 2019 and 2020 rent burden data 
+rent_burden_19 <- read.csv(rent_burden_19_dir)
+rent_burden_20 <- read.csv(rent_burden_20_dir)
+
+# Import uninsurance rate datasets of years 2019 and 2020 from the U.S. Census Bureau website
+uninsurance19<-read.csv(uninsured_19_dir)
+uninsurance20<-read.csv(uninsured_20_dir)
+
+# Import race dataset of year 2020 from the U.S. Census Bureau website
+race2020 <- read.csv(race_20_dir)
+# Import race dataset of year 2018 and 2019 from the Neighborhood Nexus website
+race1819 <- read.csv(race_18_19_dir)
+
+## Import renter occupied housing unit data from the U.S. Census Bureau website for 2019
+rent19=read.csv(renter_occupied_19_dir)
+
+#Import unemployment rate datasets of years 2019 and 2020 from the U.S. Census Bureau website
+unemp19<-read.csv(unemployment_19_dir)
+unemp20<-read.csv(unemployment_20_dir)
 ```
 
 
 
 ## Extract and Clean X Variables
 ```{r}
+### Poverty 
+### 2020
 
+# Select GEO_ID, NAME, percent in poverty columns for 2020 data
+pov_2020 <- pov2020[-1,] %>%
+  rename("TractID" = "GEO_ID", "PovertyPercent" = "S1701_C03_001E") %>%
+  mutate("PovertyRate" = as.numeric(as.character(PovertyPercent))/100) %>% mutate(TractID = substr(TractID, 10, 20)) %>%
+  select("TractID", "PovertyRate") 
+
+# Export 2020 race data as a csv file
+write.csv(pov_2020, file = file.path(cleaned_csv_folder, "poverty_20_cleaned.csv"), row.names=FALSE)
+
+### 2019 
+
+pov19 <- pov1819[,c(1,3,6)]
+names(pov19) <- c("TractID", "COUNTY", "PovertyPercent")
+# Filter 5 counties and rename columns
+pov19 <- pov19 %>%
+  filter(COUNTY %in% c("Fulton", "DeKalb", "Gwinnett", "Clayton", "Cobb")) %>% 
+  mutate("PovertyRate" = as.numeric(as.character(PovertyPercent))/100) %>% select(TractID, COUNTY, PovertyRate)
+ 
+# Export 2018, 2019 poverty data as a csv file
+write.csv(pov19, file.path(cleaned_csv_folder, "poverty_19_cleaned.csv"), row.names=FALSE)
+
+
+### Education - Rate of people who got bach degree or higher
+### 2019 and 2020
+
+# Define a function which cleans the educaton data
+education_cleaning <- function(df)  { 
+edu <- df %>%
+  select(GEO_ID, NAME, S2301_C01_035E, S2301_C01_021E)
+# Drop the first row which contains description of the data
+# and save it as a new dataframe
+edu_new <- edu[-1,]
+# Create a column that contains # of people who got bach degree
+edu_new$bach<-as.numeric(edu_new$S2301_C01_035E)
+# Create a column that contains population living in different census tracts
+edu_new$pop<-as.numeric(edu_new$S2301_C01_021E)
+# Create a column that contains percentage of ppl who got bach degrees or higher
+edu_new$education_rate_bachelors_or_higher <- edu_new$bach/edu_new$pop
+# Create a dataframe that only contains columns that are relevant to our analyses
+edu_new1 <- edu_new %>% mutate(GEO_ID = substr(GEO_ID, 10, 20)) %>%
+  select(GEO_ID, education_rate_bachelors_or_higher) 
+# Rename columns
+colnames(edu_new1) <- c('TractID', 'EducationRate')
+return(edu_new1)
+}
+# Export 2020 education data as a csv file
+education_rate_20 <- education_cleaning(edu_20)
+write.csv(education_rate_20, file.path(cleaned_csv_folder, "education_rate_cleaned_2020.csv"), row.names=FALSE)
+# Export 2019 education data as a csv file
+education_rate_19 <- education_cleaning(edu_19)
+write.csv(education_rate_19, file.path(cleaned_csv_folder, "education_rate_cleaned_2019.csv"), row.names=FALSE)
+
+
+### Rent Burden
+### 2019
+
+# Rename variable
+names(rent_burden_19)[6] <- "RentBurdenPerc"
+# Filter 5 county area
+rent_burden_19 <- rent_burden_19 %>%
+  filter(COUNTY == "Fulton" | COUNTY == "DeKalb"| COUNTY == "Cobb" | COUNTY == "Clayton" | COUNTY == "Gwinnett") %>% mutate(RentBurdenRate = RentBurdenPerc/100)
+  
+# rename columns
+rent_burden_19 <- rename(rent_burden_19,TractID=GEOID)
+# Drop columns that are irrelevant to analyses
+rent_burden_19 <- rent_burden_19 %>% select(TractID, COUNTY, RentBurdenRate)
+# Export cleaned rent burden data for 2019
+write.csv(rent_burden_19, file.path(cleaned_csv_folder, "rent_burden_rate_cleaned_2019.csv"), row.names=FALSE)
+
+### 2020
+
+# Select GEO_ID, NAME, and columns that shows rent payment consist 30 percent or more of household income
+new_20 <- rent_burden_20 %>%
+  select(B25070_001E, B25070_007E, B25070_008E, B25070_009E, B25070_010E, GEO_ID, NAME)
+
+# Rename columns
+new_20_1 <- new_20[-1,]
+new_20_1$total<-as.numeric(new_20_1$B25070_001E)
+new_20_1$rent_30<-as.numeric(new_20_1$B25070_007E)
+new_20_1$rent_35<-as.numeric(new_20_1$B25070_008E)
+new_20_1$rent_40<-as.numeric(new_20_1$B25070_009E)
+new_20_1$rent_50<-as.numeric(new_20_1$B25070_010E)
+
+# Calculate the rent burden percentage
+new_20_1$sum <- new_20_1$rent_30+new_20_1$rent_35+new_20_1$rent_40+new_20_1$rent_50
+new_20_1$percentage <- new_20_1$sum/new_20_1$total
+
+rent_burden_20 <- new_20_1 %>% mutate(TractID = substr(GEO_ID, 10, 20))  %>%
+  select(TractID, percentage) 
+rent_burden_20 <- rename(rent_burden_20,RentBurdenRate=percentage)
+
+# Export cleaned rent burden data for 2020
+write.csv(rent_burden_20, file.path(cleaned_csv_folder, "rent_burden_rate_cleaned_2020.csv"), row.names=FALSE)
+
+### Uninsured rate
+### 2019 & 2020
+
+# Define a function that drops, renames column
+uninsur_cleaning <- function(uninsur){
+  uninsur=uninsur[-c(1),]
+  uninsur=uninsur %>% select(GEO_ID, NAME, S2701_C05_001E)
+  uninsur=uninsur%>%mutate(TractID=substr(GEO_ID,10,20), UninsurRate = as.numeric(as.character(S2701_C05_001E))/100)
+  uninsur=uninsur%>%select(TractID,UninsurRate)
+  return(uninsur)
+}
+
+uninsurance_19=uninsur_cleaning(uninsurance19)
+uninsurance_20=uninsur_cleaning(uninsurance20)
+
+# Export 2019 unemployment data as a csv file
+write.csv(uninsurance_19, file.path(cleaned_csv_folder ,"uninsurance_rate_cleaned_2019.csv"), row.names=FALSE)
+# Export 2020 unemployment data as a csv file
+write.csv(uninsurance_20, file.path(cleaned_csv_folder ,"uninsurance_rate_cleaned_2020.csv"), row.names=FALSE)
+
+
+### Minority: Percentage of non-white population
+### 2020
+
+# Select GEO_ID, NAME, total population, and the white alone population columns for 2019 data
+# Calculate Minority percentage
+race_2020 <- race2020[-c(1),] %>%
+  select("GEO_ID", "NAME", "P1_001N", "P1_003N") %>%
+  mutate(MinorityRate = (as.numeric(as.character(P1_001N)) - as.numeric(as.character(P1_003N)))/ as.numeric(as.character(P1_001N))) %>% mutate(TractID=substr(GEO_ID,10,20)) %>% select(TractID, MinorityRate)
+
+# Export 2020 race data as a csv file
+write.csv(race_2020, file = file.path(cleaned_csv_folder, "race_20_cleaned.csv"), row.names=FALSE)
+
+### 2019
+race19 <- race1819[,c(1,3,6)]
+names(race19) <- c("TractID", "COUNTY", "MinorityPercent")
+race_19 <- race19 %>%
+  filter(COUNTY %in% c("Fulton", "DeKalb", "Gwinnett", "Clayton", "Cobb")) %>% 
+  mutate("MinorityRate" = as.numeric(as.character(MinorityPercent))/100) %>%
+  select("TractID", "COUNTY", "MinorityRate")
+
+# Export 18-19 race data as a csv file
+write.csv(race_19, file =  file.path(cleaned_csv_folder, "race_19_cleaned.csv"), row.names=FALSE)
+
+### Renter Occupied
+### 2019 
+
+## Remove the first row which contains the header
+rent19=rent19[-c(1),]
+## Calculate the renter occupied housing rate and rename it as renter_rate for 2019 data
+rent19=rent19%>%mutate(RenterRate=as.numeric(B25003_003E)/as.numeric(B25003_001E))
+rent19=rent19%>%select(GEO_ID,RenterRate)
+rent19=rent19%>%mutate(TractID=substr(GEO_ID,10,20))
+rent19=rent19%>%select(TractID,RenterRate)
+
+## Import renter occupied housing unit data from the U.S. Census Bureau website for 2020
+rent20=read.csv(renter_occupied_20_dir)
+rent20=rent20[-c(1),]
+
+## Calculate the renter occupied housing rate and rename it as renter_rate for 2020 data
+rent20=rent20%>%mutate(RenterRate=as.numeric(B25003_003E)/as.numeric(B25003_001E))
+rent20=rent20%>%select(GEO_ID,RenterRate)
+rent20=rent20%>%mutate(TractID=substr(GEO_ID,10,20))
+rent20=rent20%>%select(TractID,RenterRate)
+
+## Export 2020 renter occupied housing rate
+write.csv(rent19, file.path(cleaned_csv_folder, "renter_occupied_cleaned_2019.csv"), row.names=FALSE)
+write.csv(rent20, file.path(cleaned_csv_folder, "renter_occupied_cleaned_2020.csv"), row.names=FALSE)
+
+### Unemployment Rate
+### 2019 & 2020
+
+# Define a function that cleans unemployment csv files
+unemp_cleaning <- function(unemp){
+  unemp <- unemp%>%select(GEO_ID, NAME, S2301_C04_001E)
+  unemp <- unemp[-1, ] %>% mutate("TractID"=substr(GEO_ID,10,20), 
+                                  "UnempRate"=as.numeric(as.character(S2301_C04_001E))/100)
+  unemp <- unemp %>% select(TractID, UnempRate)
+  return(unemp)
+}
+
+# Export 2019 unemployment data as a csv file
+write.csv(unemp_cleaning(unemp19), file.path(cleaned_csv_folder, "unemployment_rate_cleaned_2019.csv"), row.names=FALSE)
+# Export 2020 unemployment data as a csv file
+write.csv(unemp_cleaning(unemp20), file.path(cleaned_csv_folder, "unemployment_rate_cleaned_2020.csv"), row.names=FALSE)
 ```
 
 
 ## Extract and Clean Y Variables 
+# Compute annual/monthly eviction rate
 ```{r}
+# import household count data from neighborhood nexus
+household <- read.csv(household_count_dir, skip = 1)
+# import eviction filing data
+eviction  <- read.csv(eviction_filing_dir)
 
+compute_evic_rate <- function(eviction_df, household_df, annual = TRUE){
+  # Split filing date into days, month, and years
+  eviction_df <- separate(data = eviction, col = FilingDate, sep = "/", 
+                 into = c("Dates","Month","Year"))
+  if (annual){# Compute annual total eviction filings
+      df <- eviction_df%>% group_by(TractID, Year) %>% 
+  summarize("TotalFilings" = sum(TotalFilings), )
+    
+  }
+    else {# If annual == FALSE, compute monthly total eviction filings
+      df <- df %>% group_by(TractID, CountyID, Year, Month) %>% 
+  summarize("TotalFilings" = sum(TotalFilings),)}
+  
+  # Remove observations that are missing census tract ID
+  df <- df[df$TractID != 99999999999, ]
+  # Rename variable of household data 
+  names(household_df)[6] <- "TotalHousehold2019"
+  # Subset household_df
+  df2 <- household_df[, c("GEOID", "TotalHousehold2019")]
+  # Merge eviction filing data with household count data
+  df3 <- inner_join(df, df2, by=c("TractID" = "GEOID"))
+  # Compute eviction rate
+  df3 <- df3 %>% mutate("EvictionRate" = TotalFilings/TotalHousehold2019)
+  # Remove observations with NAs
+  df3 <- na.omit(df3)
+  return(df3)
+}
 ```
 
 ## Merge Datasets
 ```{r}
+# Merge 2019
+## import Y dataset
+y=read.csv(file.path(cleaned_csv_folder, "monthly_eviction_rate_from_2019_to_2022.csv"))
+y2019=y%>%filter(Year==19)
 
+## import poverty rate data
+pov=read.csv(file.path(cleaned_csv_folder, "poverty_19_cleaned.csv"))
+
+## import educ data 
+educ=read.csv(file.path(cleaned_csv_folder, "education_rate_cleaned_2019.csv"))
+
+## import rent burden
+rent=read_csv(file.path(cleaned_csv_folder, "rent_burden_rate_cleaned_2019.csv"))
+
+## import insurance data
+uninsur=read_csv(file.path(cleaned_csv_folder, "uninsurance_rate_cleaned_2019.csv"))
+
+## import race data
+mino=read.csv(file.path(cleaned_csv_folder, "race_19_cleaned.csv"))
+
+## import renter occupied percent
+renter <- read.csv(file.path(cleaned_csv_folder, "renter_occupied_cleaned_2019.csv"))
+
+## import Unemployment rate 
+unemp <- read.csv(file.path(cleaned_csv_folder, "unemployment_rate_cleaned_2019.csv"))
+
+
+tract_to_char <- function(df){
+  df$TractID <- as.character(df$TractID)
+  return(df)
+}
+
+y2019=tract_to_char(y2019)
+pov=tract_to_char(pov)
+educ=tract_to_char(educ)
+rent=tract_to_char(rent)
+uninsur=tract_to_char(uninsur)
+mino=tract_to_char(mino)
+renter=tract_to_char(renter)
+tract=tract_to_char(unemp)
+
+
+df_2019 <- merge(y2019, pov)
+df_2019 <- merge(df_2019, educ)
+df_2019 <- merge(df_2019, rent)
+df_2019 <- merge(df_2019, uninsur)
+df_2019 <- merge(df_2019, mino )
+df_2019 <- merge(df_2019, renter)
+df_2019 <- merge(df_2019, unemp)
+write.csv(df_2019, file.path(final_csv_folder, "final_data_2019.csv"))
 ```
+
+```{r}
+# Merge 2020
+## import Y dataset
+y=read.csv(file.path(cleaned_csv_folder, "monthly_eviction_rate_from_2019_to_2022.csv"))
+y2020=y%>%filter(Year==20)
+
+## import poverty rate data
+pov=read.csv(file.path(cleaned_csv_folder, "poverty_20_cleaned.csv"))
+
+## import educ data 
+educ=read.csv(file.path(cleaned_csv_folder, "education_rate_cleaned_2020.csv"))
+
+## import rent burden
+rent=read_csv(file.path(cleaned_csv_folder, "rent_burden_rate_cleaned_2020.csv"))
+
+## import insurance data
+uninsur=read_csv(file.path(cleaned_csv_folder, "uninsurance_rate_cleaned_2020.csv"))
+
+## import race data
+mino=read.csv(file.path(cleaned_csv_folder, "race_20_cleaned.csv"))
+
+## import renter occupied percent
+renter <- read.csv(file.path(cleaned_csv_folder, "renter_occupied_cleaned_2020.csv"))
+
+## import Unemployment rate 
+unemp <- read.csv(file.path(cleaned_csv_folder, "unemployment_rate_cleaned_2020.csv"))
+
+
+tract_to_char <- function(df){
+  df$TractID <- as.character(df$TractID)
+  return(df)
+}
+
+y2020=tract_to_char(y2020)
+pov=tract_to_char(pov)
+educ=tract_to_char(educ)
+rent=tract_to_char(rent)
+uninsur=tract_to_char(uninsur)
+mino=tract_to_char(mino)
+renter=tract_to_char(renter)
+tract=tract_to_char(unemp)
+
+
+df_2020 <- merge(y2020, pov)
+nrow(df_2020)
+df_2020 <- merge(df_2020, educ)
+df_2020 <- merge(df_2020, rent)
+nrow(df_2020)
+df_2020 <- merge(df_2020, uninsur)
+df_2020 <- merge(df_2020, mino )
+df_2020 <- merge(df_2020, renter)
+df_2020 <- merge(df_2020, unemp)
+write.csv(df_2020, file.path(final_csv_folder, "final_data_2020.csv"))
+```
+
+
 
 
