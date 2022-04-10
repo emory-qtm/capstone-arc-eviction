@@ -68,13 +68,15 @@ household=read_csv("../datasets/household_count.csv")
 ```{r}
 ## clean poverty data for 2019 and 2020
 
+# Drop the first row as it contains a header
+pov_2020 <- pov2020[-1,] 
 # Select GEO_ID, NAME, percent in poverty columns for 2020 data
-pov_2020 <- pov2020[-1,] %>%
+pov_2020 <- pov_2020 %>%
   rename("TractID" = "GEO_ID", "PovertyPercent" = "S1701_C03_001E") %>%
   mutate("PovertyRate" = as.numeric(as.character(PovertyPercent))/100) %>% mutate(TractID = substr(TractID, 10, 20)) %>%
   select("TractID", "PovertyRate") 
 
-# 2019 data
+# Select columns with census tract ID and poverty rate for 2019 data
 pov19 <- pov1819[,c(1,3,6)]
 names(pov19) <- c("TractID", "COUNTY", "PovertyPercent")
 # Filter 5 counties and rename columns
@@ -83,10 +85,8 @@ pov19 <- pov19 %>%
   mutate("PovertyRate" = as.numeric(as.character(PovertyPercent))/100) %>% select(TractID, COUNTY, PovertyRate)
 
 
-
-## clean education data for 2019 and 2020
-### Education - Rate of people who got bach degree or higher
-### 2019 and 2020
+## Clean education data for 2019 and 2020 
+# Education rate: people who got a bachelor's degree or higher
 
 # Define a function which cleans the educaton data
 education_cleaning <- function(df)  { 
@@ -112,10 +112,7 @@ education_rate_20 <- education_cleaning(edu_20)
 education_rate_19 <- education_cleaning(edu_19)
 
 
-
-
-### Uninsured rate
-### 2019 & 2020
+## Uninsured rate 2019 & 2020
 
 # Define a function that drops, renames column
 uninsur_cleaning <- function(uninsur){
@@ -130,9 +127,8 @@ uninsurance_19=uninsur_cleaning(uninsurance19)
 uninsurance_20=uninsur_cleaning(uninsurance20)
 
 
-
 ### Minority: Percentage of non-white population
-### 2020
+### Year 2020
 
 # Select GEO_ID, NAME, total population, and the white alone population columns for 2019 data
 # Calculate Minority percentage
@@ -140,7 +136,7 @@ race_2020 <- race2020[-c(1),] %>%
   select("GEO_ID", "NAME", "P1_001N", "P1_003N") %>%
   mutate(MinorityRate = (as.numeric(as.character(P1_001N)) - as.numeric(as.character(P1_003N)))/ as.numeric(as.character(P1_001N))) %>% mutate(TractID=substr(GEO_ID,10,20)) %>% select(TractID, MinorityRate)
 
-# 2019
+### Year 2019
 race19 <- race1819[,c(1,3,6)]
 names(race19) <- c("TractID", "COUNTY", "MinorityPercent")
 race_19 <- race19 %>%
@@ -149,9 +145,8 @@ race_19 <- race19 %>%
   select("TractID", "COUNTY", "MinorityRate")
 
 
-
-### Renter Occupied
-### 2019 
+### Rate of apartment that are renter Occupied
+### Year 2019 
 
 ## Remove the first row which contains the header
 rent19=rent19[-c(1),]
@@ -161,7 +156,7 @@ rent19=rent19%>%select(GEO_ID,RenterRate)
 rent19=rent19%>%mutate(TractID=substr(GEO_ID,10,20))
 rent19=rent19%>%select(TractID,RenterRate)
 
-# 2020
+### Year 2020
 ## Import renter occupied housing unit data from the U.S. Census Bureau website for 2020
 rent20=rent20[-c(1),]
 
@@ -173,7 +168,7 @@ rent20=rent20%>%select(TractID,RenterRate)
 
 
 ### Unemployment Rate
-### 2019 & 2020
+### Year 2019 & 2020
 
 # Define a function that cleans unemployment csv files
 unemp_cleaning <- function(unemp){
@@ -187,11 +182,8 @@ unemp19=unemp_cleaning(unemp19)
 unemp20=unemp_cleaning(unemp20)
 
 
-
-
-
 ### Rent Burden
-### 2019
+### Year 2019
 
 # Rename variable
 names(rent_burden_19)[6] <- "RentBurdenPerc"
@@ -204,8 +196,7 @@ rent_burden_19 <- rename(rent_burden_19,TractID=GEOID)
 # Drop columns that are irrelevant to analyses
 rent_burden_19 <- rent_burden_19 %>% select(TractID, COUNTY, RentBurdenRate)
 
-
-# 2020
+### Year 2020
 # Select GEO_ID, NAME, and columns that shows rent payment consist 30 percent or more of household income
 new_20 <- rent_burden_20 %>%
   select(B25070_001E, B25070_007E, B25070_008E, B25070_009E, B25070_010E, GEO_ID, NAME)
@@ -222,18 +213,14 @@ new_20_1$rent_50<-as.numeric(new_20_1$B25070_010E)
 new_20_1$sum <- new_20_1$rent_30+new_20_1$rent_35+new_20_1$rent_40+new_20_1$rent_50
 new_20_1$percentage <- new_20_1$sum/new_20_1$total
 
+# Select columns that are relevant to the analysis and rebane tgen
 rent_burden_20 <- new_20_1 %>% mutate(TractID = substr(GEO_ID, 10, 20))  %>%
   select(TractID, percentage) 
 rent_burden_20 <- rename(rent_burden_20,RentBurdenRate=percentage)
-
-
- 
-
-
 ```
 
 
-### Extract and Clean Dependent Variable Data
+### Extract and Clean Dependent Variable Data (Eviction rate)
 ```{r}
 # import household count data from neighborhood nexus
 household <- read.csv("../datasets/household_count.csv", skip = 1)
@@ -272,10 +259,7 @@ evic=compute_evic_rate(eviction,household)
 ```
 
 
-
-
 ## Merge Data
-
 ### Merge and Export 2019 Data
 ```{r}
 y2019=evic%>%filter(Year==19)
@@ -295,7 +279,6 @@ write.csv(data19,"../datasets/data2019.csv")
 
 ```
 
-
 ### Merge and Export 2020 Data
 ```{r}
 y2020=evic%>%filter(Year==20)
@@ -310,7 +293,6 @@ data20=merge(data20,rent_burden_20)
 ### test how many unique tract regions we have
 test=data20$TractID
 length(unique(test))
-
 
 write.csv(data20,"../datasets/data2020.csv")
 ```
