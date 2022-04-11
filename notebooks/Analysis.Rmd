@@ -1,0 +1,26 @@
+---
+title: "Analysis"
+author: "ARC Capstone Team"
+date: "4/11/2022"
+output: html_document
+---
+
+## Load Packages
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE, prompt=FALSE, message = FALSE,comment=NA )
+options(repos = list(CRAN="http://cran.rstudio.com/"))
+rm(list = setdiff(ls(), lsf.str()))
+install.packages("tidyverse")
+library(tidyverse)
+library(dplyr)
+```
+
+## Import Datasets
+```{r}
+data2019=read_csv("../datasets/data2019.csv")
+data2020=read_csv("../datasets/data2020.csv")
+```
+
+## Analysis
+
+### Regression
