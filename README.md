@@ -1,2 +1,10 @@
-# capstone-arc-eviction
-Capstone project for Spring 2022 with partner Atlanta Regional Commission
+# Emory QTM Capstone: Atlanta Regional Commission (ARC) - Eviction
+![Logo](/images/QTM_Logo.png)
+
+Our capstone projects aims to identify the top five factors most highly associated with eviction on a census tract level for the five counties (Clayton, Cobb, Dekalb, Fulton, and Gwinnett) in the Atlanta region.
+
+## Contents
+- [Motivation](#motivation)
+- [Partners of Project](#project-partners)
+- [Intended Use of Project](#intended-use-of-project)
+
