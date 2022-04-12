@@ -26,3 +26,6 @@ For this project, Atlanta Regional Commission has provided us guidelines, daily 
 # Impact & Conclusion
 
 # Acknowledgements
+- [Atlanta Regional Commission](https://atlantaregional.org/)
+- [Neighborhood Nexus](https://data.neighborhoodnexus.org/)
+- [Emory QTM Department](https://quantitative.emory.edu/)
