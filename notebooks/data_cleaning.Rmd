@@ -134,14 +134,14 @@ uninsurance_20=uninsur_cleaning(uninsurance20)
 # Calculate Minority percentage
 race_2020 <- race2020[-c(1),] %>%
   select("GEO_ID", "NAME", "P1_001N", "P1_003N") %>%
-  mutate(MinorityRate = (as.numeric(as.character(P1_001N)) - as.numeric(as.character(P1_003N)))/ as.numeric(as.character(P1_001N))) %>% mutate(TractID=substr(GEO_ID,10,20)) %>% select(TractID, MinorityRate)
+  mutate(MinorityRate = 1 - (as.numeric(as.character(P1_001N)) - as.numeric(as.character(P1_003N)))/ as.numeric(as.character(P1_001N))) %>% mutate(TractID=substr(GEO_ID,10,20)) %>% select(TractID, MinorityRate)
 
 ### Year 2019
 race19 <- race1819[,c(1,3,6)]
 names(race19) <- c("TractID", "COUNTY", "MinorityPercent")
 race_19 <- race19 %>%
   filter(COUNTY %in% c("Fulton", "DeKalb", "Gwinnett", "Clayton", "Cobb")) %>% 
-  mutate("MinorityRate" = as.numeric(as.character(MinorityPercent))/100) %>%
+  mutate("MinorityRate" = 1 - as.numeric(as.character(MinorityPercent))/100) %>%
   select("TractID", "COUNTY", "MinorityRate")
 
 
@@ -271,9 +271,9 @@ data19=merge(data19,rent19)
 data19=merge(data19,unemp19)
 data19=merge(data19,rent_burden_19)
 
-### test how many unique tract regions we have
-test=data19$TractID
-length(unique(test))
+### test how many unique tract regions we have 
+#test=data19$TractID
+#length(unique(test)) #622
 
 write.csv(data19,"../datasets/data2019.csv")
 
@@ -291,9 +291,19 @@ data20=merge(data20,unemp20)
 data20=merge(data20,rent_burden_20)
 
 ### test how many unique tract regions we have
-test=data20$TractID
-length(unique(test))
+#test=data20$TractID
+#length(unique(test)) #318
 
 write.csv(data20,"../datasets/data2020.csv")
+
+print("Eviction data of year 2019 saved!")
+print(head(data19))
+print("Eviction data of year 2020 saved!")
+print(head(data20))
+
+```
+
+```{r}
+
 ```
 
