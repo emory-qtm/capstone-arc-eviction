@@ -134,7 +134,7 @@ uninsurance_20=uninsur_cleaning(uninsurance20)
 # Calculate Minority percentage
 race_2020 <- race2020[-c(1),] %>%
   select("GEO_ID", "NAME", "P1_001N", "P1_003N") %>%
-  mutate(MinorityRate = 1 - (as.numeric(as.character(P1_001N)) - as.numeric(as.character(P1_003N)))/ as.numeric(as.character(P1_001N))) %>% mutate(TractID=substr(GEO_ID,10,20)) %>% select(TractID, MinorityRate)
+  mutate(MinorityRate = (as.numeric(as.character(P1_001N)) - as.numeric(as.character(P1_003N)))/ as.numeric(as.character(P1_001N))) %>% mutate(TractID=substr(GEO_ID,10,20)) %>% select(TractID, MinorityRate)
 
 ### Year 2019
 race19 <- race1819[,c(1,3,6)]
