@@ -1,0 +1,344 @@
+---
+title: "Final Data Product"
+author: "ARC Capstone Team"
+date: "4/11/2022"
+output: 
+  html_document: 
+    toc: yes
+    theme: flatly
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(tidyverse)
+library(GGally)
+library(knitr)
+library(stargazer)
+library(data.table)
+library(ggpubr)
+library(zoo)
+library(glmnet)
+library(plyr)
+library(corrplot)
+library(PerformanceAnalytics)
+library(glmnet)
+library(Rcpp)
+library(car)
+library(MASS)
+library(moments)
+library(nnet)
+library(pdp)
+library(Matrix)
+library(stargazer)
+library(rpart)
+library(gbm)
+library(gridExtra)
+eviction_2019 <- read.csv("data2019.csv")
+eviction_2020 <- read.csv("data2020.csv")
+
+```
+
+## 1. Basic look at our dataset
+
+To take an overview to our final output, we have two census-tract level datasets for 2019 and 2020, both with 1 dependent variables: eviction rate, calculate by dividing total eviction cases to total renting households, and 7 independent variables, poverty rate, education rate, uninsurance rate, minority rate, renter rate, unemployment rate, rent burden rate. Our goal is using regression to find out which of those are the top factors contributed to high eviction rate among 5 counties in Atlanta area. We have 622 observations for our 2019 data, and 318 observations for our 2020 data. Since our observations are based on 11 digits GEOID assigned by the Census Bureau and other state and federal agencies, the reason why we have more observations for 2019 than 2020 is that we are missing dependent variablels for some of our tract area. For example, we have GEOID 13063040408 (Clayton county) for 2019, but not for 2020. 
+To take a deeper look into our data, we first calculate the average of all our variables. 
+
+```{r dataoverview}
+eviction_2019 %>%
+  drop_na(MinorityRate, RentBurdenRate) %>%
+  dplyr::select(EvictionRate, PovertyRate, EducationRate, UninsurRate, MinorityRate, RenterRate, UnempRate, RentBurdenRate) %>%
+  summarise_all(list(~mean(.)) ,na.rm=TRUE)%>%t()%>%data.frame()%>%kable( , col.names=c( "Meanvalue") , digits=3) 
+
+eviction_2020 %>%
+  dplyr::select(EvictionRate, PovertyRate, EducationRate, UninsurRate, MinorityRate, RenterRate, UnempRate, RentBurdenRate) %>%
+  summarise_all(list(~mean(.)) ,na.rm=TRUE)%>%t()%>%data.frame()%>%kable( , col.names=c( "Meanvalue") , digits=3)  
+
+```
+
+We also want to see the skewness of our data, and the best way to do so is to generate density plot for our dependent and independent variables. 
+
+```{r skewness1, warning=FALSE}
+dat1 <- data.frame(dens = c(eviction_2019$EvictionRate, eviction_2020$EvictionRate)
+                   , lines = rep(c("Eviction Rate 2019", "Eviction Rate 2020")))
+ggplot(dat1, aes(x = dens, fill = lines)) + geom_density(alpha = 0.5) + xlim(-0.05, 0.6) + labs(x = 'Distribution', y ='Density')
+```
+
+The y-axis in a density plot is the probability density function for the kernel density estimation. The x axis is often used to locate the bins. From the density plot, we could see that the red and blue line overlap wtih one another, which means the distribution of eviction rate for 2019 and 2020 are almost the same, and both are skew to right. This skewness means when we're trying to run the mlr later in our regression part, we need to take log to our dependent variable to bring the skewed dependent variable to be more normal. 
+
+
+```{r skewness2, warning=FALSE}
+dat2 <- data.frame(dens = c(eviction_2019$PovertyRate, eviction_2020$PovertyRate)
+                   , lines = rep(c("Poverty Rate 2019", "Poverty Rate 2020")))
+dat3 <- data.frame(dens = c(eviction_2019$EducationRate, eviction_2020$EducationRate)
+                   , lines = rep(c("Education Rate 2019", "Education Rate 2020")))
+dat4 <- data.frame(dens = c(eviction_2019$UninsurRate, eviction_2020$UninsurRate)
+                   , lines = rep(c("Uninsurance Rate 2019", "Uninsurance Rate 2020")))
+dat5 <- data.frame(dens = c(eviction_2019$MinorityRate, eviction_2020$MinorityRate)
+                   , lines = rep(c("Minority Rate 2019", "Minority Rate 2020")))
+dat6 <- data.frame(dens = c(eviction_2019$RenterRate, eviction_2020$RenterRate)
+                   , lines = rep(c("Renter Rate 2019", "Renter Rate 2020")))
+dat7 <- data.frame(dens = c(eviction_2019$UnempRate, eviction_2020$UnempRate)
+                   , lines = rep(c("Unemployment Rate 2019", "Unemployment Rate 2020")))
+dat8 <- data.frame(dens = c(eviction_2019$RentBurdenRate, eviction_2020$RentBurdenRate)
+                   , lines = rep(c("Rent Burden 2019", "Renter Burden 2020")))
+p2 <- ggplot(dat2, aes(x = dens, fill = lines)) + geom_density(alpha = 0.5) + xlim(-0.05, 0.6) + labs(x = 'Distribution', y ='Density')
+p3 <- ggplot(dat3, aes(x = dens, fill = lines)) + geom_density(alpha = 0.5) + xlim(-0.05, 0.6) + labs(x = 'Distribution', y ='Density')
+p4 <- ggplot(dat4, aes(x = dens, fill = lines)) + geom_density(alpha = 0.5) + xlim(-0.05, 0.6) + labs(x = 'Distribution', y ='Density')
+p5 <- ggplot(dat5, aes(x = dens, fill = lines)) + geom_density(alpha = 0.5) + xlim(-0.05, 0.6) + labs(x = 'Distribution', y ='Density')
+p6 <- ggplot(dat6, aes(x = dens, fill = lines)) + geom_density(alpha = 0.5) + xlim(-0.05, 0.6) + labs(x = 'Distribution', y ='Density')
+p7 <- ggplot(dat7, aes(x = dens, fill = lines)) + geom_density(alpha = 0.5) + xlim(-0.05, 0.6) + labs(x = 'Distribution', y ='Density')
+p8 <- ggplot(dat8, aes(x = dens, fill = lines)) + geom_density(alpha = 0.5) + xlim(-0.05, 0.6) + labs(x = 'Distribution', y ='Density')
+p2
+p3
+p4
+p5
+p6
+p7
+p8
+grid.arrange(p2, p3, p4, p5, p6, p7, p8, ncol = 2)  
+```
+
+From the graph we could see the skewness of our 7 independent variables are overlaping between year 2019 and 2020, meaning that the skewness distribution of each of our factors in these two years are almost the same, to be specific, the distribution of poverty, unemployment, and uninsurance are skewed to right, rent burden is skewed to left, and  education rate are normally distributed, while the distribution of renter rate and minority rate are atypical, which means we could not tell the distribution of these two factors. 
+
+## 2. Multiple linear regression
+
+### 1. Model and R^2
+
+Since we've discussed that the distribution of eviction rate is skewed to right and we need to take log to our dependent variable to bring the skewed dependent variable to be more normal. We could generate two basic multiple linear regression equations:
+
+Model 1 $$ log(Eviction 2019) = \beta_0 + \beta_1*Poverty + \beta_2*Edutacion + \beta_3*RentBurden + \beta_4*Uninsurance + \beta_5*Minority + \beta_6*Renter + \beta_7*Unemployment + u$$
+Model 2 $$ log(Eviction 2020) = \beta_0 + \beta_1*Poverty + \beta_2*Edutacion + \beta_3*RentBurden + \beta_4*Uninsurance + \beta_5*Minority + \beta_6*Renter + \beta_7*Unemployment + u$$
+
+```{r, echo=TRUE, results='asis'}
+Fit1 <- lm(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2019)
+Fit2 <- lm(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2020)
+stargazer(Fit1, Fit2,type = "html", covariate.labels = c("Poverty", "Education", "Rent Burden", "Uninsurance", "Minority", "Housing Occupied", "Unemployment"), dep.var.labels  = 'log(Eviction rate)', out.header=TRUE )
+```
+
+From the chart we could see the results of two multiple linear regression model, the column on the left shows the result of 2019 and the column on the right shows the result of 2020. We first look at the R sqr at the bottom of the chart, in multiple linear regression, the R2 represents the correlation coefficient between the observed values of the outcome variable (y) and the fitted (i.e., predicted) values of y. Since the R^2 will increase as more x is included in the model, we introduce “Adjusted R Square”, which is the adjustment value in the summary output is a correction for the number of x variables included in the prediction model. In our model, the adjusted R^2 for both 2019 and 2020 are around 73, which means the model explains 73% of the variance in the outcome variable, eviction rate. We then look back at the numbers on the top, those numbers outside the parentheses indicate the estimate of regression beta coefficients in our model, the star sign on the right of the number indicates the significance level, and the 3 stars indicates a factor to be the most significant. The number below inside the parentheses indicates the standard error of regression, representing the average distance that the observed values fall from the regression line. The regression beta coefficients could help us figure out which predictor variables are more significant, a positive coefficient means that this predictor variable will positively affect the eviction rate, while a negative coefficient means that this predictor variable will negatively affect the eviction rate, in other words, when it increases, the eviction rate will drop. From the chart, we could see in year 2019, housing occupied, unemployment are positively correlated, the rest of predictor variables are negatively correlated, while in year 2020, minority and housing occupied are  are positively correlated, the rest of predictor variables are negatively correlated. We could also generate our models to be:
+
+Model 1 $$ log(Eviction 2019) =  -2.510*Poverty + -1.224*Edutacion + -0.201*RentBurden + -0.587*Uninsurance + -1.936*Minority + 3.378*Renter + 0.555*Unemployment - 2.570$$
+Model 2 $$ log(Eviction 2020) =  -2.356*Poverty + -0.219*Edutacion + 0.429*RentBurden + 0.847*Uninsurance + 2.525*Minority + 3.065*Renter + -0.882*Unemployment -6.368$$
+
+From the equation and the significance level in the chart,  we could see in year 2019, poverty, education, minority and housing occupied are significant, while in 2020, poverty, minority, and housing occupied are the most significant. 
+
+### 2. Finding outliers
+
+To further improve our models, we're trying to find outliers of the models. Outliers are defined as abnormal values in a dataset that don't go with the regular distribution and have the potential to significantly distort any regression model. And by finding the outliers in our multiple linear regression models and removing them from our dataset, we could reduce the noise of our model.
+
+For Year 2019:
+
+```{r outliers1}
+plot(Fit1, which = c(4))
+
+```
+
+For Year 2020:
+
+```{r outliers2}
+plot(Fit2, which = c(4))
+
+```
+
+In these two graphs, x axis is the observation numbers of our datasets, and the y axis is Cook's Distance, which is an estimate of the influence of a data point. We defined our observations with top 3 cook's distance as outliers. From these two graphs, we could see For year 2019, outliers are oberservation number 179, 336, and 364. and in year 2020, outliers are observation number 28, 97, and 219. We deleted them from our dataset, just for now, to see how the models are improved. 
+
+
+```{r, echo=TRUE, results='asis'}
+eviction_2019_2 <- eviction_2019[-c(179, 336, 364),]
+Fit3 <- lm(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2019_2)
+eviction_2020_2 <- eviction_2020[-c(28, 97, 219),]
+Fit4 <- lm(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2020_2)
+stargazer(Fit1, Fit3,type = "html", covariate.labels = c("Poverty", "Education", "Rent Burden", "Uninsurance", "Minority", "Housing Occupied", "Unemployment"), dep.var.labels  = 'log(Eviction rate)', out.header=TRUE )
+stargazer(Fit2, Fit4,type = "html", covariate.labels = c("Poverty", "Education", "Rent Burden", "Uninsurance", "Minority", "Housing Occupied", "Unemployment"), dep.var.labels  = 'log(Eviction rate)', out.header=TRUE )
+```
+
+We could see after removing the outliers, the adjusted R^2 for 2019 increased from 0.737 to 0.750; and adjusted R^2 for 2020 incresed from 0.734 to 0.753. The estimate of regression beta coefficients and standard error also changed a little bit, even though the top factors for 2019 are still poverty, education, minority and renter, the significance of education and minority increased a little bit; poverty and housing occupied decreased a little bit. For year 2020, significance of uninsurance rate and unemployment rate increased a lot, while significance of poverty rate, minority rate, and housing occupied rate decresed a little bit. 
+
+### 3. Pre and Post COVID
+
+To further compare the eviction rate pre and post covid, we included year into our multiple linear regression model. The new model becomes: 
+
+Model 3 $$ log(Eviction rate) = \beta_0 + \beta_1*Poverty + \beta_2*Edutacion + \beta_3*RentBurden + \beta_4*Uninsurance + \beta_5*Minority + \beta_6*Renter + \beta_7*Unemployment + \beta_8*Year+u$$
+
+Since our dataset includes tract level eviction rate and all independent variable from year 2019 and 2020. We considered year is a binary variable in our equation, with "0" represents 2019, indicating "pre-covid", and "1" represents 2020, indicationg "post-covid"
+
+```{r, echo=TRUE, results='asis'}
+eviction_2019_3 <- eviction_2019[-c(3)]
+eviction_2019_3$Year <- "0"
+eviction_2020$Year <- "1"
+eviction_total <- rbind(eviction_2019_3, eviction_2020)
+Fit5 <- lm(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate + Year, eviction_total)
+stargazer(Fit5,type = "html", covariate.labels = c("Poverty", "Education", "Rent Burden", "Uninsurance", "Minority", "Housing Occupied", "Unemployment", "Year"), dep.var.labels  = 'log(Eviction rate)', out.header=TRUE )
+
+```
+
+From the chart, we could see in our new models, year which indicates pre and post covid, renter rate, education rate and poverty rate are the most significant. And from the coefficients before year, we could conclude that the log of dependent variablem eviction rate, decreased by 0.667 after covid.  
+
+We could also used year as a dummy variable to interact with other dummy variables,for example, caresact.
+
+### 4. Caresact
+
+We ran a hypothesis test to see the influence of caresact
+
+### 5. VIF and Lasso regression
+
+add correlation plot + test and interpret multicollinearity
+
+```{r lasso}
+vif(Fit1)
+set.seed(12345)
+y_lasso <- eviction_2019$EvictionRate
+x_lasso <- data.matrix(eviction_2019[,c('PovertyRate','EducationRate','UninsurRate','MinorityRate','RenterRate','UnempRate','RentBurdenRate')])
+cv_model <- cv.glmnet(x_lasso, y_lasso, alpha = 1)
+best_lambda <- cv_model$lambda.min
+best_lambda
+plot(cv_model)
+best_model <- glmnet(x_lasso, y_lasso, alpha = 1, lambda = best_lambda)
+coef(best_model)
+y_predicted <- predict(best_model, s = best_lambda, newx = x_lasso)
+sst <- sum((y_lasso - mean(y_lasso))^2)
+sse <- sum((y_predicted - y_lasso)^2)
+rsq <- 1 - sse/sst
+rsq
+vif(Fit2)
+## if you want to use lasso regression, you could rerun it for year 2020
+```
+
+## 3. Neural Networks
+
+Since our models have 7 independent variables and this is a complex real world question, we assumed that nonlinear models might be better explaining the problem than multiple linear regressions. A neural network is a series of algorithms that endeavors to recognize underlying relationships in a set of data through a process that mimics the way the human brain operates. We ran two different neural networks models for 2019 and 2020. Since the biggest problem of machine learning algorithms like neural network are overfitting, as a result, we ran the cross-validation, which is a resampling method that uses different portions of the data to test and train a model on different iterations. The goal of cross-validation is to test the model's ability to predict new data that was not used in estimating it, in order to flag problems like overfitting or selection bias and to give an insight on how the model will generalize to an independent dataset. In the neural networks, we need to set the size and decay of our model, size is the number of units in hidden layer (nnet fit a single hidden layer neural network) and decay is the regularization parameter to avoid over-fitting. 
+
+
+```{r nnet2020}
+CVInd <- function(n,K) {
+m<-floor(n/K)
+r<-n-m*K
+I<-sample(n,n)
+Ind<-list()
+for (k in 1:K) {
+  if (k <= r) 
+  kpart <- ((m+1)*(k-1)+1):((m+1)*k)
+  else 
+  kpart<-((m+1)*r+m*(k-r-1)+1):((m+1)*r+m*(k-r))
+Ind[[k]] <- I[kpart] 
+}
+Ind 
+}
+set.seed(12345)
+Nrep <- 3
+K <- 10
+n.models <- 3
+n = nrow(eviction_2020_2)
+y <- log(eviction_2020_2$EvictionRate)
+yhat <- matrix(0,n,n.models) 
+MSE <- matrix(0,Nrep,n.models) 
+for (j in 1:Nrep){
+  Ind<-CVInd(n,K)
+  for (k in 1:K){
+    out<-nnet(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2020_2[-Ind[[k]],], linout = TRUE, skip = FALSE, size = 5,decay = 0.1, maxit = 1000, trace = FALSE)
+    yhat[Ind[[k]],1]<-as.numeric(predict(out,eviction_2020_2[Ind[[k]],])) 
+    out<-nnet(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2020_2[-Ind[[k]],], linout = TRUE, skip = FALSE, size = 10,decay = 1, maxit = 1000, trace = FALSE)
+    yhat[Ind[[k]],2]<-as.numeric(predict(out, eviction_2020_2[Ind[[k]],])) 
+    out<-nnet(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2020_2[-Ind[[k]],], linout = TRUE, skip = FALSE, size = 15,decay = 5, maxit = 1000, trace = FALSE)
+    yhat[Ind[[k]],3]<-as.numeric(predict(out,eviction_2020_2[Ind[[k]],]))
+  }
+  MSE[j,]=apply(yhat,2,function(x) sum((y-x)^2))/n 
+}
+MSEAve<- apply(MSE,2,mean);
+MSEAve
+r2<-1-MSEAve/var(y);
+r2
+fit <- nnet(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2020_2, linout = TRUE, skip = FALSE, size = 5, decay = 0.1, maxit = 1000, trace = FALSE)
+summary(fit)
+yhat<- as.numeric(predict(fit))
+y = log(eviction_2020_2$EvictionRate)
+e <- y - yhat
+1-var(e)/var(y)
+```
+
+For year 2020, I tried three different models with different size and decay using the Cross Validation, from the Mean Squared CV Error and CV Rˆ2, I found the first model I choose have the lowest MSEcv (0.4858343) and highest CV Rˆ2 (0.7681736), with size = 5 and decay = 0.1. We then used this model to calculate the nnet R^2 for our dataset and found the R2 is 0.8031115, which is higher than the linear model above. Since this R^2 doesn’t have too much difference with the Rˆ2 generated by cross validation (both are higher than mlr), overfitting is not a big problem here.
+
+```{r pdp2020, warning=FALSE}
+p9 <- partial(fit, pred.var = "PovertyRate", plot = TRUE, plot.engine = "ggplot2")
+p10 <- partial(fit, pred.var = "EducationRate", plot = TRUE, plot.engine = "ggplot2")
+p11 <- partial(fit, pred.var = "RentBurdenRate", plot = TRUE, plot.engine = "ggplot2")
+p12 <- partial(fit, pred.var = "UninsurRate", plot = TRUE, plot.engine = "ggplot2")
+p13 <- partial(fit, pred.var = "MinorityRate", plot = TRUE, plot.engine = "ggplot2")
+p14 <- partial(fit, pred.var = "RenterRate", plot = TRUE, plot.engine = "ggplot2")
+p15 <- partial(fit, pred.var = "UnempRate", plot = TRUE, plot.engine = "ggplot2")
+grid.arrange(p9, p10, p11, p12, p13, p14, p15, ncol = 3)  
+```
+
+We could also use the partial dependence plot (short PDP graph) to compare the significance of our seven factors. pdp graph shows the marginal effect one or two features have on the predicted outcome of a machine learning model, in each of our pdp graph, x axis indicates each of our independent variables, and y axis indicates the marginal impact of the independent variable to the dependent variable. And we could compare the significance of our x variables by comparing the range in the y axis, a larger range in the y axis means a larger marginal impact on y, as a result, indicates a more significant x. For year 2020, we could see the renter rate and minority rate are the most significant, and only education rate shows a nonlinear characteristic, while the rest of independent variables are all linear.
+
+
+
+```{r nnet2}
+eviction_2019_5 <- eviction_2019 %>%
+  drop_na(RentBurdenRate, MinorityRate)
+CVInd <- function(n,K) {
+m<-floor(n/K)
+r<-n-m*K
+I<-sample(n,n)
+Ind<-list()
+for (k in 1:K) {
+  if (k <= r) 
+  kpart <- ((m+1)*(k-1)+1):((m+1)*k)
+  else 
+  kpart<-((m+1)*r+m*(k-r-1)+1):((m+1)*r+m*(k-r))
+Ind[[k]] <- I[kpart] 
+}
+Ind 
+}
+set.seed(12345)
+Nrep <- 3
+K <- 10
+n.models <- 3
+n = nrow(eviction_2019_5)
+y <- log(eviction_2019_5$EvictionRate)
+yhat <- matrix(0,n,n.models) 
+MSE <- matrix(0,Nrep,n.models) 
+for (j in 1:Nrep){
+  Ind<-CVInd(n,K)
+  for (k in 1:K){
+    out<-nnet(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2019_5[-Ind[[k]],], linout = TRUE, skip = FALSE, size = 5,decay = 0.1, maxit = 1000, trace = FALSE)
+    yhat[Ind[[k]],1]<-as.numeric(predict(out,eviction_2019_5[Ind[[k]],])) 
+    out<-nnet(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2019_5[-Ind[[k]],], linout = TRUE, skip = FALSE, size = 10,decay = 1, maxit = 1000, trace = FALSE)
+    yhat[Ind[[k]],2]<-as.numeric(predict(out, eviction_2019_5[Ind[[k]],])) 
+    out<-nnet(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2019_5[-Ind[[k]],], linout = TRUE, skip = FALSE, size = 15,decay = 5, maxit = 1000, trace = FALSE)
+    yhat[Ind[[k]],3]<-as.numeric(predict(out,eviction_2019_5[Ind[[k]],]))
+  }
+  MSE[j,]=apply(yhat,2,function(x) sum((y-x)^2))/n
+}
+MSEAve<- apply(MSE,2,mean);
+MSEAve
+r2<-1-MSEAve/var(y);
+r2
+fit2 <- nnet(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_2019_5, linout = TRUE, skip = FALSE, size = 5, decay = 0.1, maxit = 1000, trace = FALSE)
+summary(fit2)
+yhat<- as.numeric(predict(fit2))
+y = log(eviction_2019_5$EvictionRate)
+e <- y - yhat
+1-var(e)/var(y)
+```
+
+For year 2019, I tried three different models with different size and decay using the Cross Validation, from the Mean Squared CV Error and CV Rˆ2, I found the first model I choose have the lowest MSEcv ( 0.4143000) and highest CV Rˆ2 (0.7686838 ), with size = 5 and decay = 0.1. We then used this model to calculate the nnet R^2 for our dataset and found the R2 is 0.7919326, which is higher than the linear model above. Since this R^2 doesn’t have too much difference with the Rˆ2 generated by cross validation (both are higher than mlr), overfitting is not a big problem here.
+
+
+```{r pdp2019, warning=FALSE}
+p16 <- partial(fit2, pred.var = "PovertyRate", plot = TRUE, plot.engine = "ggplot2")
+p17 <- partial(fit2, pred.var = "EducationRate", plot = TRUE, plot.engine = "ggplot2")
+p18 <- partial(fit2, pred.var = "RentBurdenRate", plot = TRUE, plot.engine = "ggplot2")
+p19 <- partial(fit2, pred.var = "UninsurRate", plot = TRUE, plot.engine = "ggplot2")
+p20 <- partial(fit2, pred.var = "MinorityRate", plot = TRUE, plot.engine = "ggplot2")
+p21 <- partial(fit2, pred.var = "RenterRate", plot = TRUE, plot.engine = "ggplot2")
+p22 <- partial(fit2, pred.var = "UnempRate", plot = TRUE, plot.engine = "ggplot2")
+grid.arrange(p16, p17, p18, p19, p20, p21, p22, ncol = 3)  
+```
+For year 2019, we could see the renter rate,minority rate and poverty rate are the most significant, and uninsurance rate and unemployment rate show a nonlinear characteristic, while the rest of independent variables are all linear.
+
+
