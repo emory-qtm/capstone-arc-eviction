@@ -22,6 +22,9 @@ For this project, Atlanta Regional Commission has provided us guidelines, daily 
 # Intended Use of Project
 
 # Setup
+## Data Sources
+- [Census Bureau Website Data](https://data.census.gov/cedsci/)
+- [Neighborhood Nexus](https://data.neighborhoodnexus.org/)
 
 # Impact & Conclusion
 
