@@ -5,10 +5,10 @@ Our capstone project aims to identify the top five factors most highly associate
 
 ## Contents
 - [Motivation](#motivation)
-- [Partners of Project](#project-partners)
+- [Partners of Project](#partners-of-project)
 - [Intended Use of Project](#intended-use-of-project)
 - [Setup](#setup)
-- [Overview](#overview)
+- [Notebook](#notebook)
 - [Acknowledgements](#acknowledgements)
 
 
@@ -21,14 +21,30 @@ For this project, Atlanta Regional Commission has provided us guidelines, daily 
 
 # Intended Use of Project
 
+## Use Case
+
+## Use of Data Source
+
 # Setup
+
+## Software Installation
+
 ## Data Sources
 - [Census Bureau Website Data](https://data.census.gov/cedsci/)
 - [Neighborhood Nexus](https://data.neighborhoodnexus.org/)
 
-# Impact & Conclusion
+# Notebook
+
+## Overview
+
+## Major Functions
+
+## Plots
+
+## Impact and Conclusion
 
 # Acknowledgements
 - [Atlanta Regional Commission](https://atlantaregional.org/)
+- [United States Census Bureau](https://www.census.gov/)
 - [Neighborhood Nexus](https://data.neighborhoodnexus.org/)
 - [Emory QTM Department](https://quantitative.emory.edu/)
