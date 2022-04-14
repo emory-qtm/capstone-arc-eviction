@@ -41,11 +41,14 @@ Our stakeholder, [Atlanta Regional Commission](https://atlantaregional.org/), pr
 
 # Setup
 
+This section instructs the user how to download necessary datasets from various data sources and teaches user how to execute both the data cleaning and analysis notebooks to obtain the data analysis and visualization.
+
 ## Software Installation
 
-## Data Sources
-- [Census Bureau Website Data](https://data.census.gov/cedsci/)
-- [Neighborhood Nexus](https://data.neighborhoodnexus.org/)
+To begin, install the latest version of *RStudio* from [RStudio IDE](https://www.rstudio.com/products/rstudio/download/)
+
+## Download Datasets
+
 
 # Notebook
 
