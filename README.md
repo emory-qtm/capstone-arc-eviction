@@ -29,7 +29,7 @@ A typical user of this Github repository should have interest in the following:
 
 This repository is designed to help R users to analyze and visualize the relationship between factors (e.g. unemployment rate, minorty rate) and eviction filings in five metropolitan counties in Atlanta.
 
-## Use of Data Source
+## Use of Data Sources
 
 #### 1. [United States Census Bureau Data:](https://www.census.gov/)
 [United States Census Bureau](https://www.census.gov/) is the primary source we get yearly data for our independent variables, namely poverty rate, education rate, unemployment rate, minority rate, renter percentage, rent burden, and uninsured rate. Users can download datasets directly from the website in various formats and match the independent variables with eviction filings based on census tract ID to understand and explore which factors contribute the most to eviction filings.
@@ -50,14 +50,16 @@ To begin, install the latest version of *RStudio* from [RStudio IDE](https://www
 
 ## Download Datasets
 
+## Run Notebook
+
 
 # Notebook
 
 ## Overview
 
-## Major Functions
-
 ## Plots
+
+## Intended Use of Outputs
 
 ## Impact and Conclusion
 
