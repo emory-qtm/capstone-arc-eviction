@@ -44,9 +44,27 @@ Our stakeholder, [Atlanta Regional Commission](https://atlantaregional.org/), pr
 
 This section instructs the user how to download necessary datasets from various data sources and teaches user how to execute both the data cleaning and analysis notebooks to obtain the data analysis and visualization.
 
-## Software Installation
+## Installation
 
-To begin, install the latest version of *RStudio* from [RStudio IDE](https://www.rstudio.com/products/rstudio/download/)
+To begin, first install R and then install RStudio on your computer
+
+### R
+1. Go to [The Comprehensive R Archive Network](https://cran.rstudio.com/)
+![img2](/images/r-1.png)
+2. Choose the version of R that fits your operating system.
+![img3](/images/r-2.png)
+3. Download the latest version of R and then install it on the computer based on the instruction
+
+### RStudio
+
+1. To begin, go to [Download the RStudio IDE](https://www.rstudio.com/products/rstudio/download/)
+![img1](/images/rstudio-1.png)
+2. Choose Download RStudio Desktop Free version
+![img4](/images/rstudio-2.png)
+3. Download the version of RStudio that fits your computer's operating system
+
+If you have successfully installed R and RStudio, you should see the following when you open RStudio
+![img5](/images/rstudio-3.png)
 
 ## Download Datasets
 
@@ -61,7 +79,6 @@ To begin, install the latest version of *RStudio* from [RStudio IDE](https://www
 
 ## Intended Use of Outputs
 
-## Impact and Conclusion
 
 # Acknowledgements
 - [Atlanta Regional Commission](https://atlantaregional.org/)
