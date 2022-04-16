@@ -73,7 +73,24 @@ Beforing downloading the datasets, first git clone this repository to your local
 Now you should have the entire repository cloned into your local computer. Go to the cloned repository and make sure you have a folder called **datasets**
 ![img6](/images/folder.png)
 Now download each dataset from the website provided in the following table. Unzip the downloaded file and then rename each dataset from its raw name (under the column "Raw Name") to its corresponding name under the column "Dataset Name"
-
+| Dataset Name  | Raw Name      | URL           |
+| ------------- | ------------- | ------------- |
+| education_2019.csv  | ACSST5Y2019.S1501_data_with_overlays_2022-04-16T182809  |   https://data.census.gov/cedsci/table?q=education&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2019|          
+| education_2020.csv  | ACSST5Y2020.S1501_data_with_overlays_2022-04-16T183029  | https://data.census.gov/cedsci/table?q=education&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000 |
+| evictions.csv  | evictions.csv  | https://docs.google.com/forms/d/e/1FAIpQLSexUZb9dXIx5h1GjaKmuNekxvp-CkgQ_qGsoAJXDERuLslSCg/viewform |
+| household_count.csv  | household_count.csv  |      https://docs.google.com/forms/d/e/1FAIpQLSexUZb9dXIx5h1GjaKmuNekxvp-CkgQ_qGsoAJXDERuLslSCg/viewform |      
+| poverty_18_19.csv  | Content Cell  |
+| poverty_2020.csv  | ACSST5Y2020.S1701_data_with_overlays_2022-04-16T183708  | https://data.census.gov/cedsci/table?q=poverty&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2020 |
+| race_18_19.csv  | Content Cell  |
+| race_2020.csv  | DECENNIALPL2020.P1_data_with_overlays_2022-01-16T213307  | https://data.census.gov/cedsci/table?q=decennial%20census&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&tid=DECENNIALPL2020.P1 |            
+| rent_burden_2019.csv  | Content Cell  |
+| rent_burden_2020.csv  | ACSDP5Y2020.DP04_data_with_overlays_2022-04-16T184023  | https://data.census.gov/cedsci/table?q=DP04&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000 |
+| renter_occupied_2019.csv  | ACSDP5Y2019.DP04_data_with_overlays_2022-04-16T175404| https://data.census.gov/cedsci/table?q=b25003&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000 |
+| renter_occupied_2020.csv  | ACSDP5Y2020.DP04_data_with_overlays_2022-04-16T175404| https://data.census.gov/cedsci/table?q=b25003&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000 |
+| unemp_2019.csv  | ACSST5Y2019.S2301_data_with_overlays_2022-04-16T184832  | https://data.census.gov/cedsci/table?q=unemployment&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2019&tid=ACSST5Y2019.S2301 |
+| unemp_2020.csv  | ACSST5Y2020.S2301_data_with_overlays_2022-04-16T184941  | https://data.census.gov/cedsci/table?q=unemployment&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2020&tid=ACSST5Y2020.S2301 |
+| uninsured_2019.csv  | Content Cell  |
+| uninsured_2020.csv  | Content Cell  |
 
 Then, move all datasets (CSV format) inside the folder **datasets**. If you have done this step correctly, you should have the following when you go to **datasets** folder
 ![img7](/images/datasets.png)
