@@ -89,8 +89,8 @@ Now download each dataset from the website provided in the following table. Unzi
 | renter_occupied_2020.csv  | ACSDP5Y2020.DP04_data_with_overlays_2022-04-16T175404| https://data.census.gov/cedsci/table?q=b25003&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000 |
 | unemp_2019.csv  | ACSST5Y2019.S2301_data_with_overlays_2022-04-16T184832  | https://data.census.gov/cedsci/table?q=unemployment&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2019&tid=ACSST5Y2019.S2301 |
 | unemp_2020.csv  | ACSST5Y2020.S2301_data_with_overlays_2022-04-16T184941  | https://data.census.gov/cedsci/table?q=unemployment&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2020&tid=ACSST5Y2020.S2301 |
-| uninsured_2019.csv  | Content Cell  |
-| uninsured_2020.csv  | Content Cell  |
+| uninsured_2019.csv  | ACSST5Y2019.S2701_data_with_overlays_2022-04-16T214752  | https://data.census.gov/cedsci/table?q=s2701&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2019 |
+| uninsured_2020.csv  | ACSST5Y2020.S2701_data_with_overlays_2022-04-16T214904  | https://data.census.gov/cedsci/table?q=s2701&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2020 |
 
 Then, move all datasets (CSV format) inside the folder **datasets**. If you have done this step correctly, you should have the following when you go to **datasets** folder
 ![img7](/images/datasets.png)
