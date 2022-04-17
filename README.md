@@ -79,11 +79,11 @@ Now download each dataset from the website provided in the following table. Unzi
 | education_2020.csv  | ACSST5Y2020.S1501_data_with_overlays_2022-04-16T183029  | https://data.census.gov/cedsci/table?q=education&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000 |
 | evictions.csv  | evictions.csv  | https://docs.google.com/forms/d/e/1FAIpQLSexUZb9dXIx5h1GjaKmuNekxvp-CkgQ_qGsoAJXDERuLslSCg/viewform |
 | household_count.csv  | household_count.csv  |      https://docs.google.com/forms/d/e/1FAIpQLSexUZb9dXIx5h1GjaKmuNekxvp-CkgQ_qGsoAJXDERuLslSCg/viewform |      
-| poverty_18_19.csv  | Content Cell  |
+| poverty_18_19.csv  | DN-EXPORT-GATRACTS-04-16-22.csv  | https://data.neighborhoodnexus.org/ |
 | poverty_2020.csv  | ACSST5Y2020.S1701_data_with_overlays_2022-04-16T183708  | https://data.census.gov/cedsci/table?q=poverty&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2020 |
-| race_18_19.csv  | Content Cell  |
-| race_2020.csv  | DECENNIALPL2020.P1_data_with_overlays_2022-01-16T213307  | https://data.census.gov/cedsci/table?q=decennial%20census&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&tid=DECENNIALPL2020.P1 |            
-| rent_burden_2019.csv  | Content Cell  |
+| race_18_19.csv  | DN-EXPORT-GATRACTS-04-16-22.csv  | https://data.neighborhoodnexus.org/ |
+| race_2020.csv  | DECENNIALPL2020.P1_data_with_overlays_2022-01-16T213307  | https://data.census.gov/cedsci/table?q=decennial%20census&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2020&tid=DECENNIALPL2020.P1 |         
+| rent_burden_2019.csv  | DN-EXPORT-GATRACTS-04-16-22.csv  | https://data.neighborhoodnexus.org/ |
 | rent_burden_2020.csv  | ACSDP5Y2020.DP04_data_with_overlays_2022-04-16T184023  | https://data.census.gov/cedsci/table?q=DP04&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000 |
 | renter_occupied_2019.csv  | ACSDP5Y2019.DP04_data_with_overlays_2022-04-16T175404| https://data.census.gov/cedsci/table?q=b25003&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000 |
 | renter_occupied_2020.csv  | ACSDP5Y2020.DP04_data_with_overlays_2022-04-16T175404| https://data.census.gov/cedsci/table?q=b25003&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000 |
@@ -95,15 +95,27 @@ Now download each dataset from the website provided in the following table. Unzi
 Then, move all datasets (CSV format) inside the folder **datasets**. If you have done this step correctly, you should have the following when you go to **datasets** folder
 ![img7](/images/datasets.png)
 
-
-
 ## Run Notebook
+To run the notebooks, first run *data_cleaning.Rmd*
+![img8](/images/cleaning-1.png)
+You should get three new datasets in the **datasets** folder
+
+
+Next run *data_analysis.Rmd* to get all the analysis
+
+
+
+
+
+
+
 
 
 # Notebook
 
 ## Overview
 
+In our capstone project, we have two notebooks. *data_cleaning.Rmd* notebook is used for extracting useful explanatory and dependent variables from raw datasets and combine them into cleaned datasets. *data_analysis.Rmd* notebook is used to analyze how different factors interact with eviction filings and finds the top five factors most highly associated with eviction on a census-tract level in Atlanta region. Based on our analysis, we also recommend policies that may help lower eviction rate in certain census tract regions. There are several major functions of our analysis notebook.
 ## Plots
 
 ## Intended Use of Outputs
