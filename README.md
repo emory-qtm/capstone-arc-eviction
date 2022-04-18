@@ -127,4 +127,4 @@ In our capstone project, we have two notebooks. *data_cleaning.Rmd* notebook is 
 - Identify the relationship between the factors and eviction filings for different counties in Georgia -->
 
 # Acknowledgements
-These notebooks were created by Fenton Sun, Ryan Lee, Keving Ding, Hyesun Jun, and Matthew Thompson. This project wouldn't have been possible without the support from Dr. Blake Fleischer, Dr. Ben Miller, [Atlanta Regional Commission](https://atlantaregional.org/), and [Emory University QTM Department](https://quantitative.emory.edu/). These notebooks were built using the R statistical program.
+These notebooks were created by Fenton Sun, Ryan Lee, Kevin Ding, Hyesun Jun, and Matthew Thompson. This project wouldn't have been possible without the support from Dr. Blake Fleischer, Dr. Ben Miller, [Atlanta Regional Commission](https://atlantaregional.org/), and [Emory University QTM Department](https://quantitative.emory.edu/). These notebooks were built using the R statistical program.
