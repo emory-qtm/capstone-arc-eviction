@@ -34,10 +34,10 @@ This repository is designed to help R users to analyze and visualize the relatio
 ## Use of Data Sources
 
 #### 1. [United States Census Bureau Data:](https://www.census.gov/)
-[United States Census Bureau](https://www.census.gov/) is the primary source we get yearly data for our independent variables, namely poverty rate, education rate, unemployment rate, minority rate, renter percentage, rent burden, and uninsured rate. Users can download datasets directly from the website in various formats and match the independent variables with eviction filings based on census tract ID to understand and explore which factors contribute the most to eviction filings.
+[United States Census Bureau](https://www.census.gov/) is the primary source we get yearly data for our independent variables, namely <i>poverty rate, education rate, unemployment rate, minority rate, renter occupied units, rent burden, and uninsured rate</i>. Users can download datasets directly from the website in various formats and match the independent variables with eviction filings based on census tract ID to understand and explore which factors contribute the most to eviction filings.
 
 #### 2. [Neighborhood Nexus Data:](https://data.neighborhoodnexus.org/)
-[Neighbourhood Nexus](https://data.neighborhoodnexus.org/) provides us the yearly data of poverty rate, minority rate, and rent burden for the year of 2019 for each census-tract region we. Users can download datasets in various formats directly from the website and match data with the eviction filing data based on census tract ID to understand the association between poverty rate, minority rate, rent burden and eviction filings.
+[Neighbourhood Nexus](https://data.neighborhoodnexus.org/) provides us the yearly data of poverty rate, minority rate, and rent burden for the year of 2019 for each census-tract region we investigate on. Users can download datasets in various formats directly from the website and match data with the eviction filing data based on census tract ID to understand the association between poverty rate, minority rate, rent burden and eviction filings.
 
 #### 3. [Atlanta Regional Commission Data:](https://atlantaregional.org/)
 Our stakeholder, [Atlanta Regional Commission](https://atlantaregional.org/), provides us the number of total households and daily eviction filings data for each census-tract region in the five counties we are interested in from January 2019 to January 2022. Users can use this data to explore the distribution of eviction filings during this time frame.
@@ -48,7 +48,7 @@ This section instructs the user how to download necessary datasets from various 
 
 ## Installation
 
-To begin, first install R and then install RStudio on your computer
+To begin, first install R and then install RStudio on your computer. Ensure that you installed the lastest version of <i>tidyverse, dplyr, and ggplot2</i>, on your computer. This project requires R 3.30+ and RStudio >= 2022.02.1+461. 
 
 ### R
 1. Go to [The Comprehensive R Archive Network](https://cran.rstudio.com/)
@@ -121,7 +121,10 @@ In our capstone project, we have two notebooks. *data_cleaning.Rmd* notebook is 
 ## Plots
 
 ## Intended Use of Outputs
-
+A user may load the notebook to:
+- Compare how different factors can affect eviction filings
+- Explore trends in eviction filings in Georgia
+- Identify the relationship between the factors and eviction filings for different counties in Georgia
 
 # Acknowledgements
 - [Atlanta Regional Commission](https://atlantaregional.org/)
