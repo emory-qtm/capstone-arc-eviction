@@ -100,10 +100,10 @@ Then, move all datasets (CSV format) inside the folder **datasets**. If you have
 ## Run Notebook
 To run the notebooks, first run *data_cleaning.Rmd*
 ![img8](/images/cleaning-1.png)
-You should get three new datasets in the **datasets** folder
-
-
+You should get two new datasets in the **datasets** folder
+![img9](/images/cleaning-2.png)
 Next run *data_analysis.Rmd* to get all the analysis
+
 
 
 
@@ -121,10 +121,10 @@ In our capstone project, we have two notebooks. *data_cleaning.Rmd* notebook is 
 ## Plots
 
 ## Intended Use of Outputs
-A user may load the notebook to:
+<!-- A user may load the notebook to:
 - Compare how different factors can affect eviction filings
 - Explore trends in eviction filings in Georgia
-- Identify the relationship between the factors and eviction filings for different counties in Georgia
+- Identify the relationship between the factors and eviction filings for different counties in Georgia -->
 
 # Acknowledgements
 - [Atlanta Regional Commission](https://atlantaregional.org/)
