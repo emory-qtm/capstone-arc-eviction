@@ -34,10 +34,10 @@ This repository is designed to help R users to analyze and visualize the relatio
 ## Use of Data Sources
 
 #### 1. [United States Census Bureau Data:](https://www.census.gov/)
-[United States Census Bureau](https://www.census.gov/) is the primary source we get yearly data for our independent variables, namely <i>poverty rate, education rate, unemployment rate, minority rate, renter occupied units, rent burden, and uninsured rate</i>. Users can download datasets directly from the website in various formats and match the independent variables with eviction filings based on census tract ID to understand and explore which factors contribute the most to eviction filings.
+[United States Census Bureau](https://www.census.gov/) is the primary source we get yearly data for our independent variables, namely <i>poverty rate, education rate, unemployment rate, minority rate, renter occupied units, rent burden, and uninsured rate</i>. The original source is from the 5-year American Community Survey (ACS). Users can download datasets directly from the website in various formats and match the independent variables with eviction filings based on census tract ID to understand and explore which factors contribute the most to eviction filings.
 
 #### 2. [Neighborhood Nexus Data:](https://data.neighborhoodnexus.org/)
-[Neighbourhood Nexus](https://data.neighborhoodnexus.org/) provides us the yearly data of poverty rate, minority rate, and rent burden for the year of 2019 for each census-tract region we investigate on. Users can download datasets in various formats directly from the website and match data with the eviction filing data based on census tract ID to understand the association between poverty rate, minority rate, rent burden and eviction filings.
+[Neighbourhood Nexus](https://data.neighborhoodnexus.org/) provides us the yearly data of <i>poverty rate, minority rate, and rent burden</i> for the year of 2019 for each census-tract region we investigate on. The original source is from the 5-year American Community Survey (ACS). Users can download datasets in various formats directly from the website and match data with the eviction filing data based on census tract ID to understand the association between poverty rate, minority rate, rent burden and eviction filings.
 
 #### 3. [Atlanta Regional Commission Data:](https://atlantaregional.org/)
 Our stakeholder, [Atlanta Regional Commission](https://atlantaregional.org/), provides us the number of total households and daily eviction filings data for each census-tract region in the five counties we are interested in from January 2019 to January 2022. Users can use this data to explore the distribution of eviction filings during this time frame.
@@ -127,7 +127,4 @@ In our capstone project, we have two notebooks. *data_cleaning.Rmd* notebook is 
 - Identify the relationship between the factors and eviction filings for different counties in Georgia -->
 
 # Acknowledgements
-- [Atlanta Regional Commission](https://atlantaregional.org/)
-- [United States Census Bureau](https://www.census.gov/)
-- [Neighborhood Nexus](https://data.neighborhoodnexus.org/)
-- [Emory QTM Department](https://quantitative.emory.edu/)
+These notebooks were created by Fenton Sun, Ryan Lee, Keving Ding, Hyesun Jun, and Matthew Thompson. This project wouldn't have been possible without the support from Dr. Blake Fleischer, Dr. Ben Miller, [Atlanta Regional Commission](https://atlantaregional.org/), and [Emory University QTM Department](https://quantitative.emory.edu/). These notebooks were built using the R statistical program.
