@@ -102,13 +102,8 @@ To run the notebooks, first run *data_cleaning.Rmd*
 ![img8](/images/cleaning-1.png)
 You should get two new datasets in the **datasets** folder
 ![img9](/images/cleaning-2.png)
-Next run *data_analysis.Rmd* to get all the analysis
-
-
-
-
-
-
+Next run *data_analysis.Rmd* to get all the analysis (e.g. plots, regression models)
+![img10](/images/analysis-1.png)
 
 
 
@@ -117,7 +112,8 @@ Next run *data_analysis.Rmd* to get all the analysis
 
 ## Overview
 
-In our capstone project, we have two notebooks. *data_cleaning.Rmd* notebook is used for extracting useful explanatory and dependent variables from raw datasets and combine them into cleaned datasets. *data_analysis.Rmd* notebook is used to analyze how different factors interact with eviction filings and finds the top five factors most highly associated with eviction on a census-tract level in Atlanta region. Based on our analysis, we also recommend policies that may help lower eviction rate in certain census tract regions. There are several major functions of our analysis notebook.
+In our capstone project, we have two notebooks. *data_cleaning.Rmd* notebook is used for extracting useful explanatory and dependent variables from raw datasets and combine them into cleaned datasets. *data_analysis.Rmd* notebook is used to analyze how different factors interact with eviction filings and finds the top five factors most highly associated with eviction on a census-tract level in Atlanta region. Based on our analysis, we also recommend policies that may help lower eviction rate in certain census tract regions. There are several major functions of our analysis notebook. In the first section, it shows the distribution of explanatory variables and dependent variables as histograms. In the second section, it runs a multiple linear regression model in the combined dataset (2019 & 2020) to analyze which factors have the greatest impact on eviction rate. In the third section, it splits the data into two parts, the data of 2019 and the data of 2020. It compare the distribution of explanatory and dependent variables as histograms in two years. Next, it runs a multiple linear regression in each year to track the changes (both in magnitude and direction) of coefficients of each explanatory variable. In the fourth section, we run correlation matrix, variance inflation factor (VIF), and Lasso to examine the issue of multicollinearity in our regression model. In the final section, we also run a neural network analysis to examine any non-linear behavior existed in the datasets.
+
 ## Plots
 
 ## Intended Use of Outputs
