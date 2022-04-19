@@ -48,7 +48,7 @@ This section instructs the user how to download necessary datasets from various 
 
 ## Installation
 
-To begin, first install R and then install RStudio on your computer. Ensure that you installed the lastest version of <i>tidyverse, dplyr, and ggplot2</i>, on your computer. This project requires R 3.30+ and RStudio >= 2022.02.1+461. 
+To begin, first install R, RStudio, and then git on your computer. Ensure that you installed the lastest version of <i>tidyverse, dplyr, and ggplot2</i>, on your computer. This project requires R 3.30+ and RStudio >= 2022.02.1+461. 
 
 ### R
 1. Go to [The Comprehensive R Archive Network](https://cran.rstudio.com/)
@@ -67,6 +67,10 @@ To begin, first install R and then install RStudio on your computer. Ensure that
 
 If you have successfully installed R and RStudio, you should see the following when you open RStudio
 ![img5](/images/rstudio-3.png)
+
+### Git
+Go to this website [Download Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and download the git that fits your operating system
+![img15](/images/git-1.png)
 
 
 ## Download Datasets
