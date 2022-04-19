@@ -264,25 +264,11 @@ Model 2 $$ log(Eviction 2020) =  -2.356*Poverty + -0.219*Edutacion + 0.429*RentB
 
 From the equation and the significance level in the chart,  we could see education is significant in year 2019 but not in 2020. 
 
-## 4. Correlation Plot, VIF, and Lasso Regression
+## 4. Correlation Matrices, and VIF
 
-We generated our correlation plot in Python, we've also ran vif and lasso to test multicollinearity
+We generated our correlation matrices in Python with the file name <i>correlation_matrix.ipynb</i>, we've also ran vif and lasso to test multicollinearity
 
-```{r lasso}
+The VIF values for each of the independent variables
+```{r}
 vif(fit1)
-set.seed(12345)
-y_lasso <- eviction_2019$EvictionRate
-x_lasso <- data.matrix(eviction_2019[,c('PovertyRate','EducationRate','UninsurRate','MinorityRate','RenterRate','UnempRate','RentBurdenRate')])
-cv_model <- cv.glmnet(x_lasso, y_lasso, alpha = 1)
-best_lambda <- cv_model$lambda.min
-best_lambda
-plot(cv_model)
-best_model <- glmnet(x_lasso, y_lasso, alpha = 1, lambda = best_lambda)
-coef(best_model)
-y_predicted <- predict(best_model, s = best_lambda, newx = x_lasso)
-sst <- sum((y_lasso - mean(y_lasso))^2)
-sse <- sum((y_predicted - y_lasso)^2)
-rsq <- 1 - sse/sst
-rsq
-## if you want to use lasso regression, you could rerun it for year 2020
 ```
