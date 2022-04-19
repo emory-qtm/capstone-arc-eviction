@@ -296,6 +296,7 @@ data20=merge(data20,rent_burden_20)
 
 write.csv(data20,"../datasets/data2020.csv")
 
+### print the first several rows of the data just to verify
 print("Eviction data of year 2019 saved!")
 print(head(data19))
 print("Eviction data of year 2020 saved!")
@@ -303,7 +304,4 @@ print(head(data20))
 
 ```
 
-```{r}
-
-```
 
