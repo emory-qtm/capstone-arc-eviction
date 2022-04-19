@@ -116,11 +116,18 @@ In our capstone project, we have two notebooks. *data_cleaning.Rmd* notebook is 
 
 ## Plots
 
+The two plots below are examples of plots you get by running our analysis notebook.
+
+This plot below shows the distribution of eviction rate in the combined dataset (2019 & 2020). The histogram suggests that the distribution of eviction rate is heavily right-skewed, as it has a rather long tail. This plot informs our team to take the log transformation of eviction rate before running regression analysis to ensure we have a normalized dataset.
+![img11](/images/plot-1.png)
+
+This plot below shows the distribution of rent burden rate in the combined dataset (2019 & 2020). Rent burden rate is defined as the percentage of population who spent more than 30% of their income on housing rental fees. This plot indicates the distribution of rent burden rate is roughly normally distributed, as most census-tract regions have rent burden rate somewhere between 0.3 and 0.8.
+![img12](/images/plot-2.png)
+
 ## Intended Use of Outputs
-<!-- A user may load the notebook to:
-- Compare how different factors can affect eviction filings
-- Explore trends in eviction filings in Georgia
-- Identify the relationship between the factors and eviction filings for different counties in Georgia -->
+By running the analysis on the dataset, our team concludes that the top five factors highly associated with evictions on a census tract level in the Atlanta region are poverty rate, race, education, pecentage of renter occupied housing, and rent burden. We conclude the first four factors based on our regression models, and we conclude rent burden based on visually inspecting the dataset and also connecting to external factors, such as policies.
+
+Based on our conclusion, we have also suggested some policy recommendations that might help lower eviction rate.
 
 # Acknowledgements
 These notebooks were created by Fenton Sun, Ryan Lee, Kevin Ding, Hyesun Jun, and Matthew Thompson. This project wouldn't have been possible without the support from Dr. Blake Fleischer, Dr. Ben Miller, [Atlanta Regional Commission](https://atlantaregional.org/), and [Emory University QTM Department](https://quantitative.emory.edu/). These notebooks were built using the R statistical program.
