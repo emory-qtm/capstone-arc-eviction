@@ -80,7 +80,8 @@ Beforing downloading the datasets, first git clone this repository to your local
 >     - git clone https://github.com/emory-qtm/capstone-arc-eviction.git
 Now you should have the entire repository cloned into your local computer. Go to the cloned repository and make sure you have a folder called **datasets**
 ![img6](/images/folder.png)
-Now download each dataset from the website provided in the following table. Unzip the downloaded file and then rename each dataset from its raw name (under the column "Raw Name") to its corresponding name under the column "Dataset Name"
+Now download each dataset from the website provided in the following table. Unzip the downloaded file and then rename each dataset from its raw name (under the column "Raw Name") to its corresponding name under the column "Dataset Name". Note that when you download the data from the link below, the downloaded file name may not match the names below exactly, but the format should be very similar, as it includes the downloaded data as part of the name.
+
 | Dataset Name  | Raw Name      | URL           |
 | ------------- | ------------- | ------------- |
 | education_2019.csv  | ACSST5Y2019.S1501_data_with_overlays_2022-04-16T182809  |   https://data.census.gov/cedsci/table?q=education&g=0500000US13063%241400000,13067%241400000,13089%241400000,13121%241400000,13135%241400000&y=2019|          
