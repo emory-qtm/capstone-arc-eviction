@@ -1,32 +1,32 @@
 ---
-title: "Final Data Product"
+title: "Data Analysis"
 author: "ARC Capstone Team"
-date: "4/11/2022"
-output:
-  html_document:
+date: "4/19/2022"
+output: 
+  html_document: 
     toc: yes
     theme: flatly
     code_folding: hide
-  pdf_document:
-    toc: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
 library(ggplot2)
 library(tidyr)
-library(tidyverse)
+library(knitr)
 library(stargazer)
 library(boot)
-library(dplyr)
+library(car)
 eviction_2019 <- read.csv("../datasets/data2019.csv")
 eviction_2020 <- read.csv("../datasets/data2020.csv")
+evictions  <- read.csv("../datasets/evictions.csv")
 
 ```
 
 ## 1. Basic look at our dataset
 
-To take an overview to our final output, we have two census-tract level datasets for 2019 and 2020, both with 1 dependent variables: eviction rate, calculate by dividing total eviction cases to total renting households, and 7 independent variables, poverty rate, education rate, uninsurance rate, minority rate, renter rate, unemployment rate, rent burden rate. Our goal is using regression to find out which of those are the top factors contributed to high eviction rate among 5 counties in Atlanta area. We have 622 observations for our 2019 data, and 318 observations for our 2020 data. Since our observations are based on 11 digits GEOID assigned by the Census Bureau and other state and federal agencies, the reason why we have more observations for 2019 than 2020 is that we are missing dependent variablels for some of our tract area. For example, we have GEOID 13063040408 (Clayton county) for 2019, but not for 2020. Since our goal is to find top factors for eviction rate, but not in a specific time line. We think it would be better to combine our 2019 and 2020 dataset for more obervations. 
+To take an overview to our data, we have two census-tract level datasets for 2019 and 2020, both with 1 dependent variables: eviction rate, calculate by dividing total eviction cases to total renting households, and 7 independent variables, poverty rate, education rate, uninsurance rate, minority rate, renter rate, unemployment rate, rent burden rate. Our goal is using regression to find out which of those are the top factors contributed to high eviction rate among 5 counties in Atlanta area. We have 622 observations for our 2019 data, and 318 observations for our 2020 data. Since our observations are based on 11 digits GEOID assigned by the Census Bureau and other state and federal agencies, the reason why we have more observations for 2019 than 2020 is that we are missing dependent variablels for some of our tract area. For example, we have GEOID 13063040408 (Clayton county) for 2019, but not for 2020. Since our goal is to find top factors for eviction rate, but not in a specific time line. We think it would be better to combine our 2019 and 2020 dataset for more obervations. 
 
 To take a deeper look into our data, we first calculate the average of all our variables. The first chart shows the combination of 2019 and 2020, the second shows 2019, and the third shows 2020.
 
@@ -91,7 +91,7 @@ Model 1 $$ log(Eviction Rate) = \beta_0 + \beta_1*Poverty + \beta_2*Edutacion + 
 ```{r, echo=TRUE, results='asis'}
 fit1 <- lm(log(EvictionRate) ~ PovertyRate + EducationRate + RentBurdenRate + UninsurRate + MinorityRate + RenterRate + UnempRate, eviction_total)
 stargazer(fit1,type = "html", covariate.labels = c("Poverty", "Education", "Rent Burden", "Uninsurance", "Minority", "Housing Occupied", "Unemployment"), dep.var.labels  = 'log(Eviction rate)', out.header=TRUE )
-
+kable(vif(fit1))
 
 ```
 
@@ -160,7 +160,6 @@ We used bootstrapping method, which replicates sampling with replacements, to ex
 ```{r bootstrap preprocess}
 # Preprocess data for the analyses
 # import eviction filing data
-evictions  <- read.csv("../datasets/evictions.csv")
 
 # Define a function that restructures data for the hypothesis testing
 compute_weekly_evictions <- function(df){
@@ -223,6 +222,7 @@ plot(rncc)
 
 Distribution of sample means suggest that the weekly eviction filings reported was lower in 2020 than 2019 (CI: 95%).
 
+
 ### 3. Multiple linear regression
 
 We took log to our dependent variable to bring the skewed dependent variable to be more normal. We could generate two basic multiple linear regression equations:
@@ -243,11 +243,8 @@ Model 2 $$ log(Eviction 2020) =  -2.356*Poverty + -0.219*Edutacion + 0.429*RentB
 
 From the equation and the significance level in the chart,  we could see education is significant in year 2019 but not in 2020. 
 
-## 4. Correlation Matrices, and VIF
+## 4. Conclusion
+Based on our regression analysis and connecting our data with what happened in real life, our team believe that poverty rate, education rate, race (minority rate), renter occupied unit rate, and rent burden are the top five factors most highly associated with evictions on a census tract level in the Atlanta region. 
 
-We generated our correlation matrices in Python with the file name <i>correlation_matrix.ipynb</i>, we've also ran vif and lasso to test multicollinearity
+Our team chose these five explanatory variables because poverty rate, education rate, minority race, and renter occupied unit rate are the most significant variables based on the output from the regression analysis we conducted on both the combined (2019 & 2020) data sets and also the separate ones. We chose rent burden as the fifth one since rent burden is most directly related to having difficulties being able to afford to pay rent on a consistent basis. Also rent burden helps reflect the overall economic conditions of that tract, such as the overall income of the renters in the area, an important consideration.
 
-The VIF values for each of the independent variables
-```{r}
-vif(fit1)
-```
