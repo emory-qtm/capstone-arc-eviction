@@ -1,1 +1,1 @@
-This is a text file.
+Put downloaded data sets in this folder.
