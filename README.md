@@ -124,7 +124,7 @@ In our capstone project, we have three notebooks. *data_cleaning.Rmd* notebook i
 
 ## Plots
 
-The two plots below are examples of plots you get by running our analysis notebook.
+The two plots below are examples of plots you would get by running our analysis notebook.
 
 This plot below shows the distribution of eviction rate in the combined dataset (2019 & 2020). The histogram suggests that the distribution of eviction rate is heavily right-skewed, as it has a rather long tail. This plot informs our team to take the log transformation of eviction rate before running regression analysis to ensure we have a normalized dataset.
 ![img11](/images/plot-1.png)
