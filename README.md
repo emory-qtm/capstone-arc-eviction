@@ -109,8 +109,9 @@ To run the notebooks, first run *data_cleaning.Rmd*
 You should get two new datasets in the **datasets** folder
 ![img9](/images/cleaning-2.png)
 Next run *data_analysis.Rmd* to get all the analysis (e.g. plots, regression models)
-![img10](/images/analysis.png)
-
+![img10](/images/data-analysis.png)
+You can also run *correlation_matrix.ipynb* to get a more visually-appealing correlation matrix
+![img16](/images/corr-matrix.png)
 
 
 
