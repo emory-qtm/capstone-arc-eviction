@@ -68,7 +68,11 @@ To begin, install R, RStudio, and git on your computer. This project requires R 
 If you have successfully installed R and RStudio, you should see the following when you open RStudio
 ![img5](/images/rstudio-3.png)
 
+### Install prequisite R packages
+Open RStudio Desktop Free version and enter the following into the console:
+>  install.packages(c("dplyr", "ggplot2", "tidyr", "knitr", "stargazer", "boot", "car"))
 
+![img17](/images/r-pkg-install.png)
 
 ### Git
 Go to this website [Download Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and download the git that fits your operating system
@@ -77,7 +81,8 @@ Go to this website [Download Git](https://git-scm.com/book/en/v2/Getting-Started
 
 ## Download Datasets
 Before downloading the datasets, first git clone this repository to your local computer. To git clone this repository, go to Terminal and type the following command
->     - git clone https://github.com/emory-qtm/capstone-arc-eviction.git
+>     git clone https://github.com/emory-qtm/capstone-arc-eviction.git
+
 Now you should have the entire repository cloned into your local computer. Go to the cloned repository and make sure you have a folder called **datasets**
 ![img6](/images/folder.png)
 Now download each dataset from the website provided in the following table. Unzip the downloaded file and then rename each dataset from its raw name (under the column "Raw Name") to its corresponding name under the column "Dataset Name". Note that when you download the data from the link below, the downloaded file name may not match the names below exactly, but the format should be very similar, as it includes the downloaded data as part of the name.
